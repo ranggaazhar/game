@@ -1,23 +1,54 @@
-/* App.css */
+/* App.css (KODE LENGKAP) */
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&display=swap');
 
 /* --- GLOBAL STYLES --- */
 body {
   margin: 0;
-  overflow: hidden; /* Mencegah scrolling saat animasi */
-  font-family: 'Fredoka One', cursive; /* Font yang lebih playful */
+  overflow: hidden; 
+  font-family: 'Fredoka One', cursive; 
 }
 
 .main-container {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #87ceeb 0%, #a9d4f4 50%, #60a3bc 100%); /* Gradien langit ke air */
+  background: linear-gradient(to bottom, #87ceeb 0%, #a9d4f4 50%, #60a3bc 100%); 
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative; /* Penting untuk posisi absolut elemen anak */
-  overflow: hidden; /* Memastikan awan/teratai tidak meluber */
+  position: relative; 
+  overflow: hidden; 
 }
+
+/* --- NEW: MUTE BUTTON STYLE --- */
+.mute-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #2e8b57;
+    border: 3px solid #2e8b57;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: bold;
+    z-index: 100; /* Pastikan selalu di atas */
+    font-family: 'Fredoka One', cursive;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.mute-button:hover {
+    background-color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+}
+
+.mute-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
 
 /* --- LOBBY CONTAINER (untuk background animatif) --- */
 .lobby-container {
@@ -28,52 +59,52 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  z-index: 1; /* Pastikan menu di atas elemen background */
+  z-index: 1; 
 }
 
 /* --- MENU CARD --- */
 .lobby-menu-card {
   padding: 60px 40px;
-  border-radius: 20px; /* Lebih bulat */
-  background: rgba(255, 255, 255, 0.9); /* Sedikit transparan */
-  box-shadow: 0 15px 30px rgba(0,0,0,0.3); /* Bayangan lebih dramatis */
+  border-radius: 20px; 
+  background: rgba(255, 255, 255, 0.9); 
+  box-shadow: 0 15px 30px rgba(0,0,0,0.3); 
   text-align: center;
-  border: 6px solid #2e8b57; /* Warna hijau kuat */
-  z-index: 10; /* Pastikan di atas semua dekorasi */
-  animation: fadeIn 1s ease-out forwards; /* Animasi muncul */
-  position: relative; /* Untuk z-index */
+  border: 6px solid #2e8b57; 
+  z-index: 10; 
+  animation: fadeIn 1s ease-out forwards; 
+  position: relative; 
 }
 
 .lobby-title {
   color: #2e8b57;
-  font-size: 3.5em; /* Ukuran lebih besar */
+  font-size: 3.5em; 
   margin-bottom: 40px;
-  font-family: 'Press Start 2P', cursive; /* Font retro gaming */
-  text-shadow: 4px 4px 0px #4f8a33; /* Efek 3D */
-  animation: bounceIn 1.5s ease-out; /* Animasi judul */
+  font-family: 'Press Start 2P', cursive; 
+  text-shadow: 4px 4px 0px #4f8a33; 
+  animation: bounceIn 1.5s ease-out; 
 }
 
 .lobby-play-button {
   display: block;
-  width: 350px; /* Lebih lebar */
+  width: 350px; 
   padding: 20px;
   margin: 30px auto;
-  font-size: 24px; /* Lebih besar */
+  font-size: 24px; 
   cursor: pointer;
   background-color: #6dbf44;
   color: white;
   border: none;
-  border-radius: 12px; /* Lebih bulat */
+  border-radius: 12px; 
   transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
   font-weight: bold;
-  box-shadow: 0 8px 0 #4f8a33; /* Bayangan tombol 3D */
-  animation: pulse 2s infinite ease-in-out; /* Animasi denyut */
+  box-shadow: 0 8px 0 #4f8a33; 
+  animation: pulse 2s infinite ease-in-out; 
 }
 
 .lobby-play-button:hover {
-  background-color: #8acb68; /* Warna hover lebih terang */
-  transform: translateY(-3px); /* Efek tekan */
-  box-shadow: 0 10px 0 #4f8a33; /* Bayangan lebih besar saat hover */
+  background-color: #8acb68; 
+  transform: translateY(-3px); 
+  box-shadow: 0 10px 0 #4f8a33; 
 }
 
 .lobby-play-button:active {
@@ -160,7 +191,7 @@ body {
   width: 100px;
   height: 60px;
   top: 15%;
-  right: -20%; /* Awan dari kanan */
+  right: -20%; 
   animation: moveCloudRight 18s linear infinite;
   animation-delay: 10s;
 }
@@ -176,22 +207,22 @@ body {
 
 @keyframes moveCloud {
   0% { transform: translateX(0%); }
-  100% { transform: translateX(calc(100vw + 200px)); } /* Bergerak ke kanan melewati layar */
+  100% { transform: translateX(calc(100vw + 200px)); } 
 }
 
 @keyframes moveCloudRight {
   0% { transform: translateX(0%); }
-  100% { transform: translateX(calc(-100vw - 200px)); } /* Bergerak ke kiri melewati layar */
+  100% { transform: translateX(calc(-100vw - 200px)); } 
 }
 
 /* --- ANIMASI TERATAI --- */
 .lily-pad {
   position: absolute;
-  background-color: #348a34; /* Hijau teratai */
+  background-color: #348a34; 
   border-radius: 50%;
   width: 100px;
   height: 40px;
-  bottom: -20px; /* Mulai dari bawah layar */
+  bottom: -20px; 
   box-shadow: 0 5px 10px rgba(0,0,0,0.2);
   z-index: 0;
   opacity: 0.7;
@@ -206,7 +237,7 @@ body {
   width: 100%;
   height: 100%;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #6ab04c, #348a34); /* Gradien untuk efek 3D */
+  background: radial-gradient(circle at 30% 30%, #6ab04c, #348a34); 
 }
 
 .lily-pad-1 {
@@ -244,12 +275,12 @@ body {
   position: absolute;
   width: 80px;
   height: 60px;
-  background-color: #4CAF50; /* Warna kodok */
-  border-radius: 50% 50% 30% 30%; /* Bentuk badan kodok */
-  bottom: 50px; /* Posisi relatif ke bawah */
+  background-color: #4CAF50; 
+  border-radius: 50% 50% 30% 30%; 
+  bottom: 50px; 
   left: 20%;
   z-index: 5;
-  animation: frogJump 4s ease-in-out infinite; /* Animasi lompat */
+  animation: frogJump 4s ease-in-out infinite; 
 }
 
 .animated-frog::before, .animated-frog::after {
@@ -263,8 +294,8 @@ body {
   top: -10px;
 }
 
-.animated-frog::before { left: 10px; } /* Mata kiri */
-.animated-frog::after { right: 10px; } /* Mata kanan */
+.animated-frog::before { left: 10px; } 
+.animated-frog::after { right: 10px; } 
 
 .animated-frog .eye-pupil::before, .animated-frog .eye-pupil::after {
     content: '';
@@ -281,8 +312,8 @@ body {
 
 @keyframes frogJump {
   0% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(50px, -80px) scale(1.1); /* Lompat ke atas */ }
+  25% { transform: translate(50px, -80px) scale(1.1); }
   50% { transform: translate(100px, 0) scale(1); }
-  75% { transform: translate(50px, -40px) scale(1.05); /* Lompatan lebih kecil */ }
+  75% { transform: translate(50px, -40px) scale(1.05); }
   100% { transform: translate(0, 0) scale(1); }
 }

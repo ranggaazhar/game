@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import FrogQuiz from "./components/FrogQuiz";
+import LevelSelection from "./components/LevelSelection";
 import './App.css'; // Untuk gaya lobby/menu
 import './FrogQuiz.css'; // Untuk gaya UI Game (header, question box, dll.)
 
@@ -10,6 +11,7 @@ let backgroundMusic;
 
 const GameLobby = () => {
   const [currentGame, setCurrentGame] = useState("MENU");
+  const [selectedLevel, setSelectedLevel] = useState(null);
   const musicRef = useRef(null);
 
   // --- MUSIC HANDLER ---
@@ -56,11 +58,18 @@ const GameLobby = () => {
   }, [currentGame]);
 
 
+  const handleSelectLevel = (levelTitle, levelQuestions) => {
+    setSelectedLevel({ title: levelTitle, questions: levelQuestions });
+    setCurrentGame("FROG_QUIZ");
+  };
+
   const renderContent = () => {
     switch (currentGame) {
       case "FROG_QUIZ":
-        // Panggil FrogQuiz dengan prop onBack untuk kembali ke menu
-        return <FrogQuiz onBack={() => setCurrentGame("MENU")} />; 
+        // Panggil FrogQuiz dengan prop onBack untuk kembali ke pemilihan level
+        return <FrogQuiz onBack={() => setCurrentGame("LEVEL_SELECTION")} questions={selectedLevel?.questions} currentLevel={selectedLevel?.title} />; 
+      case "LEVEL_SELECTION":
+        return <LevelSelection onSelectLevel={handleSelectLevel} />;
       case "MENU":
       default:
         return (
@@ -69,7 +78,7 @@ const GameLobby = () => {
               <h1 className="lobby-title">🐸 Froggy Quiz Adventure! </h1>
               <button
                 className="lobby-play-button"
-                onClick={() => setCurrentGame("FROG_QUIZ")}
+                onClick={() => setCurrentGame("LEVEL_SELECTION")}
               >
                 Mulai Petualangan!
               </button>

@@ -1,0 +1,126 @@
+/* src/styles/LevelSelection.css */
+
+/* --- 1. Container & Card --- */
+
+/* Pastikan elemen dekorasi berada di belakang card */
+.lobby-container > div:not(.lobby-menu-card) {
+      z-index: 1;
+}
+
+.level-selection-card {
+    z-index: 10;
+    /* Animasi masuk */
+    animation: fadeInZoom 0.8s ease-out;
+}
+
+@keyframes fadeInZoom {
+0% { 
+opacity: 0; 
+transform: translate(-50%, -50%) scale(0.8); 
+}
+100% { 
+opacity: 1; 
+transform: translate(-50%, -50%) scale(1); 
+}
+}
+
+.level-title-animated {
+color: #388e3c; /* Warna hijau kodok */
+font-size: 2.5em;
+margin-bottom: 10px;
+text-shadow: 2px 2px 0 #1e6d42;
+}
+
+.lobby-hint {
+color: #555;
+font-style: italic;
+margin-bottom: 20px;
+}
+
+
+/* --- 2. Tombol Level Selection --- */
+.level-buttons-container {
+display: flex;
+flex-direction: column;
+gap: 20px;
+width: 100%;
+max-width: 400px; /* Batasi lebar tombol */
+margin: 30px auto 0 auto;
+}
+
+.level-button {
+padding: 18px 30px;
+font-size: 24px;
+font-weight: 800;
+color: white;
+border: none;
+border-radius: 15px;
+cursor: pointer;
+transition: all 0.3s ease;
+text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+position: relative;
+overflow: hidden;
+display: flex;
+justify-content: space-between;
+align-items: center;
+
+
+opacity: 0;
+transform: translateX(-50px);
+animation: slideIn 0.5s forwards;
+}
+
+@keyframes slideIn {
+100% { opacity: 1; transform: translateX(0); }
+}
+
+
+.level-icon {
+font-size: 1.5em;
+transition: transform 0.3s;
+}
+
+.level-button:hover .level-icon {
+transform: rotate(10deg) scale(1.1);
+}
+
+/* Level EASY */
+.level-button.easy {
+background-color: #4CAF50; 
+box-shadow: 0 7px 0 #388E3C;
+}
+.level-button.easy:hover {
+transform: translateY(-3px);
+box-shadow: 0 10px 0 #388E3C;
+}
+
+/* Level MEDIUM */
+.level-button.medium {
+background-color: #FFC107; 
+color: #333;
+box-shadow: 0 7px 0 #FF8F00;
+}
+.level-button.medium:hover {
+transform: translateY(-3px);
+box-shadow: 0 10px 0 #FF8F00;
+}
+
+/* Level HARD */
+.level-button.hard {
+background-color: #D32F2F; 
+box-shadow: 0 7px 0 #B71C1C;
+}
+.level-button.hard:hover {
+transform: translateY(-3px);
+box-shadow: 0 10px 0 #B71C1C;
+}
+
+.level-button:active {
+    transform: translateY(2px);
+    box-shadow: 0 5px 0 var(--shadow-color, #333); /* Menggunakan variabel CSS */
+}
+
+/* Atur shadow-color saat active */
+.level-button.easy:active { --shadow-color: #388E3C; }
+.level-button.medium:active { --shadow-color: #FF8F00; }
+.level-button.hard:active { --shadow-color: #B71C1C; }

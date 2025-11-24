@@ -13,14 +13,14 @@
     overflow: hidden;
 }
 
-/* --- 2. Header Score/Lives (Perbaikan Lives) --- */
+/* --- 2. Header Score/Lives --- */
 .quiz-header {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 70px;
-    background: linear-gradient(180deg, #2e8b57 0%, #1e6d42 100%);
+    background: linear-gradient(180deg, #2e8b57 0%, #1e6d42 100%); /* Hijau lumut gelap */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -31,7 +31,8 @@
     font-size: 1.3em;
     font-weight: 700;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    animation: float 4s ease-in-out infinite alternate;
+    /* Efek melayang halus */
+    animation: float 4s ease-in-out infinite alternate; 
 }
 
 @keyframes float {
@@ -46,19 +47,41 @@
     flex-shrink: 0; 
 }
 
-/* PERBAIKAN: Kontainer Ikon Hati dibuat lebih rapat dan rapi */
+/* Kontainer Ikon Hati */
 .lives-container {
     display: flex;
-    gap: 2px; /* Lebih rapat */
+    gap: 2px;
     align-items: center; 
 }
 
 .heart-icon {
-    font-size: 1.5em; /* Ukuran yang lebih menonjol */
+    font-size: 1.5em; 
     animation: heartPulse 1.5s infinite ease-in-out alternate;
+    transition: opacity 0.5s, transform 0.5s;
+    display: inline-block; 
+}
+
+/* Nyawa yang sudah hilang secara permanen */
+.heart-icon.lost {
+    opacity: 0.3;
+    filter: grayscale(100%);
+    animation: none;
+}
+
+/* EFEK KEHILANGAN NYAWA (Dipicu oleh class 'losing') */
+.heart-icon.losing {
+    animation: loseLifeAnim 0.8s ease-out forwards;
+    transform-origin: center bottom; /* Fokus animasi dari bawah */
+}
+
+@keyframes loseLifeAnim {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5) translateY(-20px); opacity: 0.5; } /* Efek meletus/terangkat */
+    100% { transform: scale(0); opacity: 0; }
 }
 
 /* Staggered animation delay untuk efek berdenyut bergantian */
+.heart-icon:nth-child(1) { animation-delay: 0s; }
 .heart-icon:nth-child(2) { animation-delay: 0.1s; }
 .heart-icon:nth-child(3) { animation-delay: 0.2s; }
 .heart-icon:nth-child(4) { animation-delay: 0.3s; }
@@ -71,16 +94,16 @@
 
 
 .timer-display {
-    color: #ffcc00; 
+    color: #ffcc00; /* Kuning terang */
     font-size: 1.1em;
 }
 
-/* --- 3. Kotak Pertanyaan (Presisi di Tengah) --- */
+/* --- 3. Kotak Pertanyaan --- */
 .question-box {
     position: absolute;
     top: 100px;
     left: 50%;
-    transform: translateX(-50%); /* Menjamin posisi tengah horizontal yang presisi */
+    transform: translateX(-50%); 
     width: 80%;
     max-width: 700px; 
     
@@ -88,7 +111,7 @@
     padding: 25px;
     border-radius: 20px; 
     text-align: center;
-    border: 6px solid #6dbf44; 
+    border: 6px solid #6dbf44; /* Hijau terang */
     font-size: 24px; 
     font-weight: 800;
     color: #333;
@@ -106,7 +129,7 @@
 /* --- 4. Teks Feedback (Benar/Salah) --- */
 .feedback-text {
     position: absolute;
-    top: 45%; /* Diatur di tengah vertikal layar agar tidak menabrak kotak soal */
+    top: 45%; 
     left: 50%;
     transform: translateX(-50%);
     font-size: 60px; 
@@ -146,6 +169,11 @@
     z-index: 30;
     font-size: 2em;
     animation: fadeIn 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 .game-over-overlay h1 {
