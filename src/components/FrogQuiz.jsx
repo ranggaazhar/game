@@ -2,12 +2,11 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Sketch from "react-p5";
-import '../FrogQuiz.css'; // Pastikan CSS diimpor
 
 // --- GLOBAL VARIABLES & HELPER FUNCTIONS ---
 const CANVAS_WIDTH = window.innerWidth;
 const CANVAS_HEIGHT = window.innerHeight;
-const INITIAL_FROG_Y = CANVAS_HEIGHT * 0.75; 
+const INITIAL_FROG_Y = CANVAS_HEIGHT * 0.75; // Posisi kodok di 75% tinggi layar
 
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
@@ -22,6 +21,7 @@ let correctSound;
 let wrongSound;
 let gameOverSound;
 
+// Tambahkan prop onBack di sini
 const FrogQuiz = ({ onBack }) => { 
   // --- STATE REACT (Untuk UI Overlay) ---
   const [score, setScore] = useState(0);
@@ -44,8 +44,8 @@ const FrogQuiz = ({ onBack }) => {
 
   // --- STATE REF (P5.js Logic) ---
   const gameState = useRef("PLAYING");
-  const yOffset = useRef(0); 
-  const scrollTargetY = useRef(0); 
+  const yOffset = useRef(0); // Offset untuk scrolling
+  const scrollTargetY = useRef(0); // Target Y Offset
 
   const currentPlatform = useRef({
     x: CANVAS_WIDTH / 2,
@@ -59,11 +59,12 @@ const FrogQuiz = ({ onBack }) => {
     targetX: CANVAS_WIDTH / 2,
     targetY: INITIAL_FROG_Y,
     animT: 0,
-    action: "IDLE", 
+    action: "IDLE", // JUMP_TO_CHECK, SINK_AFTER_JUMP, SINK
     startX: CANVAS_WIDTH / 2,
     startY: INITIAL_FROG_Y,
   });
 
+  // Posisi pad diatur relatif terhadap lebar layar
   const defaultPadPositions = [
     { x: CANVAS_WIDTH * 0.25, y: CANVAS_HEIGHT * 0.4 },
     { x: CANVAS_WIDTH * 0.5, y: CANVAS_HEIGHT * 0.3 },
@@ -120,7 +121,7 @@ const FrogQuiz = ({ onBack }) => {
       setPadToHide(null);
       initializeQuestionPads();
     } else {
-      setFeedback("Menang! 🎉");
+      setFeedback("Menang!");
       setGameOver(true);
       gameState.current = "GAMEOVER";
       if (gameOverSound) gameOverSound.play();
@@ -149,6 +150,7 @@ const FrogQuiz = ({ onBack }) => {
     if (!isCorrect) {
       setPadToHide(selectedIndex); 
     }
+    // Logika lanjutan di updateFrog setelah mendarat
   };
 
   // --- EFFECTS / LIFECYCLES ---
@@ -174,7 +176,7 @@ const FrogQuiz = ({ onBack }) => {
     }
   }, [timer, gameOver, lives]);
 
-  // --- P5.JS FUNCTIONS (Sama seperti sebelumnya) ---
+  // --- P5.JS FUNCTIONS (HARUS LENGKAP) ---
 
   const preload = (p5) => {
     try {
@@ -192,8 +194,7 @@ const FrogQuiz = ({ onBack }) => {
     p5.textAlign(p5.CENTER, p5.CENTER);
     p5.ellipseMode(p5.CENTER);
   };
-  
-  // Fungsi drawLilyPad dan drawFrog dipertahankan sama persis dari kode sebelumnya
+
   const drawLilyPad = (p5, x, y, size, text, idx, scale) => {
       p5.push();
       p5.translate(x, y);
@@ -250,50 +251,50 @@ const FrogQuiz = ({ onBack }) => {
         p5.text(text, 0, 0);
       }
       p5.pop();
-  };
+    };
 
-  const drawFrog = (p5, x, y, s) => {
-      p5.push();
-      p5.translate(x, y);
-      p5.scale(s);
+    const drawFrog = (p5, x, y, s) => {
+        p5.push();
+        p5.translate(x, y);
+        p5.scale(s);
 
-      // BAYANGAN KODOK
-      p5.noStroke();
-      p5.fill(0, 0, 0, 80);
-      p5.ellipse(0, 20, 50, 10);
+        // BAYANGAN KODOK
+        p5.noStroke();
+        p5.fill(0, 0, 0, 80);
+        p5.ellipse(0, 20, 50, 10);
 
-      // Kaki Belakang
-      p5.fill(50, 205, 50);
-      p5.ellipse(-25, 10, 20, 40);
-      p5.ellipse(25, 10, 20, 40);
-      // Badan
-      p5.fill(34, 139, 34);
-      p5.ellipse(0, 0, 60, 50);
-      // Perut
-      p5.fill(144, 238, 144);
-      p5.ellipse(0, 5, 30, 25);
-      // Mata
-      p5.fill(34, 139, 34);
-      p5.circle(-15, -20, 20);
-      p5.circle(15, -20, 20);
-      p5.fill(255);
-      p5.circle(-15, -20, 15);
-      p5.circle(15, -20, 15);
-      p5.fill(0);
-      p5.circle(-15, -20, 5);
-      p5.circle(15, -20, 5);
-      // Mulut (Senyum)
-      p5.noFill();
-      p5.stroke(0);
-      p5.strokeWeight(2);
-      p5.arc(0, 0, 20, 20, 0.2 * p5.PI, 0.8 * p5.PI);
-      // Tas Ungu
-      p5.noStroke();
-      p5.fill(128, 0, 128);
-      p5.rect(-10, 10, 20, 15, 5);
+        // Kaki Belakang
+        p5.fill(50, 205, 50);
+        p5.ellipse(-25, 10, 20, 40);
+        p5.ellipse(25, 10, 20, 40);
+        // Badan
+        p5.fill(34, 139, 34);
+        p5.ellipse(0, 0, 60, 50);
+        // Perut
+        p5.fill(144, 238, 144);
+        p5.ellipse(0, 5, 30, 25);
+        // Mata
+        p5.fill(34, 139, 34);
+        p5.circle(-15, -20, 20);
+        p5.circle(15, -20, 20);
+        p5.fill(255);
+        p5.circle(-15, -20, 15);
+        p5.circle(15, -20, 15);
+        p5.fill(0);
+        p5.circle(-15, -20, 5);
+        p5.circle(15, -20, 5);
+        // Mulut (Senyum)
+        p5.noFill();
+        p5.stroke(0);
+        p5.strokeWeight(2);
+        p5.arc(0, 0, 20, 20, 0.2 * p5.PI, 0.8 * p5.PI);
+        // Tas Ungu
+        p5.noStroke();
+        p5.fill(128, 0, 128);
+        p5.rect(-10, 10, 20, 15, 5);
 
-      p5.pop();
-  };
+        p5.pop();
+    };
 
 
   const draw = (p5) => {
@@ -354,18 +355,23 @@ const FrogQuiz = ({ onBack }) => {
       const optionText = allQuestions[questionIndex] ? allQuestions[questionIndex].options[idx] : "";
 
       if (padToHide === idx && frog.current.action === "JUMP_TO_CHECK") {
+        // Biarkan pad terlihat normal saat kodok lompat menuju ke pad
         let floatY = (gameState.current === "PLAYING") ? Math.sin(p5.frameCount * 0.03 + idx) * 5 : 0;
         drawLilyPad(p5, pad.x, pad.y + floatY, 130, optionText, idx, 1);
       } 
       else if (padToHide === idx) {
+        // Animasi teratai tenggelam/mengecil (setelah kodok mendarat/salah/benar)
         let shrinkScale = 1;
         let sinkY = pad.y;
         
+        // Animasi tenggelam saat kodok SINK_AFTER_JUMP
         if (frog.current.action === "SINK_AFTER_JUMP") {
           shrinkScale = p5.lerp(1, 0, p5.constrain((frog.current.y - pad.y) / 150, 0, 1));
           sinkY = p5.lerp(pad.y, pad.y + 200, p5.constrain((frog.current.y - pad.y) / 150, 0, 1));
         }
+         // Animasi tenggelam setelah jawaban benar/salah (menghilang untuk transisi)
         else if (gameState.current === "ANIMATING" && frog.current.action !== "JUMP_TO_CHECK") {
+             // Cepat menghilang
              shrinkScale = p5.lerp(1, 0, frog.current.animT * 2);
              sinkY = p5.lerp(pad.y, pad.y + 100, frog.current.animT * 2);
         }
@@ -375,6 +381,7 @@ const FrogQuiz = ({ onBack }) => {
         }
       } 
       else {
+        // Gambar teratai normal
         let floatY = (gameState.current === "PLAYING") ? Math.sin(p5.frameCount * 0.03 + idx) * 5 : 0;
         drawLilyPad(p5, pad.x, pad.y + floatY, 130, optionText, idx, 1);
       }
@@ -409,7 +416,7 @@ const FrogQuiz = ({ onBack }) => {
         f.x = f.targetX;
         f.y = f.targetY;
         f.scale = 1;
-        f.animT = 1; 
+        f.animT = 1; // Pastikan animT tetap di 1 setelah mendarat
 
         if (f.action === "JUMP_TO_CHECK") {
           const currentQuestion = allQuestions[questionIndex];
@@ -438,7 +445,7 @@ const FrogQuiz = ({ onBack }) => {
                 isStart: false
               };
               
-              setScore((s) => s + 100 + timer * 5); 
+              setScore((s) => s + 100 + timer * 5); // Bonus waktu
               setPadToHide(clickedPadIndex); 
               setTimeout(() => {
                 nextQuestion();
@@ -492,15 +499,6 @@ const FrogQuiz = ({ onBack }) => {
       });
     }
   };
-  
-  // FUNGSI BARU UNTUK RENDER NYAWA
-  const renderLives = () => {
-    return Array(lives).fill(0).map((_, index) => (
-        <span key={index} role="img" aria-label="heart" className="heart-icon">
-            ❤️
-        </span>
-    ));
-  };
 
 
   // --- RENDER UI ---
@@ -517,9 +515,9 @@ const FrogQuiz = ({ onBack }) => {
       <div className="quiz-header">
         <div className="header-item">
           Lives:{" "}
-          <div className="lives-container">
-            {renderLives()}
-          </div>
+          <span role="img" aria-label="heart" className="lives-display">
+            {"❤️".repeat(lives)}
+          </span>
         </div>
         <div className="header-item timer-display">Time: {timer}s</div>
         <div className="header-item score-display">Score: {score}</div>
