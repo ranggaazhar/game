@@ -9,7 +9,8 @@
     height: 100vh; 
     margin: 0;
     padding: 0;
-    font-family: 'Poppins', sans-serif; /* Font yang lebih modern */
+    /* Menggunakan font yang umum dan bersih */
+    font-family: 'Poppins', sans-serif; 
     overflow: hidden;
 }
 
@@ -19,8 +20,8 @@
     top: 0;
     left: 0;
     width: 100%;
-    height: 70px; /* Lebih tinggi */
-    background: linear-gradient(180deg, #2e8b57 0%, #1e6d42 100%); /* Gradien */
+    height: 70px; 
+    background: linear-gradient(180deg, #2e8b57 0%, #1e6d42 100%); 
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -39,12 +40,29 @@
     100% { transform: translateY(-5px); }
 }
 
-.lives-display, .timer-display, .score-display {
-    transition: transform 0.2s;
+.header-item {
+    display: flex; /* Menggunakan flex untuk memisahkan label dan nilainya */
+    align-items: center;
+    /* Disesuaikan: Jarak yang lebih baik antara label dan nilainya */
+    gap: 10px; 
 }
 
+/* PERBAIKAN: Kontainer Ikon Hati */
+.lives-container {
+    display: flex;
+    /* Disesuaikan: Jarak antar ikon hati ditingkatkan */
+    gap: 5px; 
+}
+
+.heart-icon {
+    font-size: 1.2em; /* Atur ukuran ikon */
+    transition: transform 0.2s;
+}
+/* END PERBAIKAN */
+
+
 .timer-display {
-    color: #ffcc00; /* Kuning untuk waktu */
+    color: #ffcc00; 
     font-size: 1.1em;
 }
 
@@ -55,7 +73,7 @@
     left: 50%;
     transform: translateX(-50%);
     width: 80%;
-    max-width: 700px; /* Lebih lebar */
+    max-width: 700px; 
     background: #ffffff;
     padding: 25px;
     border-radius: 20px; 
@@ -66,7 +84,7 @@
     color: #333;
     z-index: 10;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
-    animation: slideDown 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55); /* Bounce effect */
+    animation: slideDown 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
 }
 
 @keyframes slideDown {
@@ -81,13 +99,12 @@
     bottom: 30%;
     left: 50%;
     transform: translateX(-50%);
-    font-size: 60px; /* Lebih besar */
+    font-size: 60px; 
     font-weight: 900;
     color: #fff;
     text-shadow: 6px 6px 8px rgba(0, 0, 0, 0.9);
     z-index: 20;
 
-    /* Animasi: Denyutan dan sedikit naik */
     animation: feedbackPop 0.6s ease-out, pulseText 2s infinite;
 }
 
@@ -126,7 +143,7 @@
     color: #ffcc00; 
     margin-bottom: 20px;
     text-shadow: 4px 4px 0 #cc3700;
-    animation: flash 1s infinite alternate; /* Animasi berkedip */
+    animation: flash 1s infinite alternate; 
 }
 
 @keyframes flash {
@@ -169,14 +186,15 @@
 /* --- 7. Tombol Kembali --- */
 .back-button {
     position: absolute;
-    top: 15px; 
+    /* Perbaikan: Memindahkan tombol ke bawah header (tinggi header 70px) + margin 15px */
+    top: 85px; 
     left: 15px; 
     padding: 10px 20px; 
     font-size: 18px; 
     background-color: #6dbf44; 
     color: white; 
     border: none; 
-    border-radius: 50px; /* Lebih bulat */
+    border-radius: 50px; 
     cursor: pointer;
     z-index: 100;
     transition: background-color 0.2s, box-shadow 0.1s;
