@@ -4,8 +4,8 @@ import Sketch from "react-p5";
 // --- GLOBAL VARIABLES & HELPER FUNCTIONS ---
 const CANVAS_WIDTH = 800;
 const CANVAS_HEIGHT = 600;
+const INITIAL_FROG_Y = CANVAS_HEIGHT - 150; // Y = 450 (posisi tengah teratai mulai)
 
-// Fungsi untuk mengacak array (Fisher-Yates shuffle)
 const shuffleArray = (array) => {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -14,8 +14,6 @@ const shuffleArray = (array) => {
   return array;
 };
 
-// --- AUDIO FILES (Placeholder) ---
-// Pastikan Anda telah menaruh file audio di folder public/sounds/
 let jumpSound;
 let correctSound;
 let wrongSound;
@@ -28,103 +26,121 @@ const FrogQuiz = () => {
   const [timer, setTimer] = useState(20);
   const [questionIndex, setQuestionIndex] = useState(0);
   const [gameOver, setGameOver] = useState(false);
-  const [feedback, setFeedback] = useState(""); // "Benar!" atau "Salah!"
-  const [currentPads, setCurrentPads] = useState([]); // Posisi pads yang sudah diacak
+  const [feedback, setFeedback] = useState("");
+  const [currentPads, setCurrentPads] = useState([]); 
+  const [padToHide, setPadToHide] = useState(null); 
 
-  // --- DATA PERTANYAAN ---
   const allQuestions = [
-    {
-      q: "Metode p5.js untuk menggambar lingkaran adalah?",
-      options: ["rect()", "circle()", "line()"],
-      ans: 1, // index jawaban benar (circle)
-    },
-    {
-      q: "Hook React untuk menyimpan state adalah?",
-      options: ["useEffect", "useState", "useHistory"],
-      ans: 1, // useState
-    },
-    {
-      q: "Warna default background web adalah?",
-      options: ["Putih", "Hitam", "Biru"],
-      ans: 0, // Putih
-    },
-    {
-        q: "Apa nama library untuk menggambar di React?",
-        options: ["react-dom", "react-p5", "react-redux"],
-        ans: 1, // react-p5
-    },
-    {
-        q: "Fungsi untuk inisialisasi p5.js adalah?",
-        options: ["draw()", "setup()", "loop()"],
-        ans: 1, // setup()
-    },
-    {
-        q: "Apa fungsi Hook 'useEffect'?",
-        options: ["Mengubah state", "Menggantikan componentDidMount/Update", "Membuat komponen baru"],
-        ans: 1, // Menggantikan componentDidMount/Update
-    },
+    { q: "Metode p5.js untuk menggambar lingkaran adalah?", options: ["rect()", "circle()", "line()"], ans: 1 }, 
+    { q: "Hook React untuk menyimpan state adalah?", options: ["useEffect", "useState", "useHistory"], ans: 1 },
+    { q: "Warna default background web adalah?", options: ["Putih", "Hitam", "Biru"], ans: 0 },
+    { q: "Apa nama library untuk menggambar di React?", options: ["react-dom", "react-p5", "react-redux"], ans: 1 },
+    { q: "Fungsi untuk inisialisasi p5.js adalah?", options: ["draw()", "setup()", "loop()"], ans: 1 },
+    { q: "Apa fungsi Hook 'useEffect'?", options: ["Mengubah state", "Menggantikan componentDidMount/Update", "Membuat komponen baru"], ans: 1 },
   ];
 
-  // --- STATE REF (Untuk Logika P5 tanpa re-render) ---
-  const gameState = useRef("PLAYING"); // PLAYING, ANIMATING, GAMEOVER
+  // --- STATE REF (P5.js Logic) ---
+  const gameState = useRef("PLAYING"); 
+  const yOffset = useRef(0); // Offset untuk scrolling
+  const scrollTargetY = useRef(0); // Target Y Offset
+  
+  const currentPlatform = useRef({
+    x: CANVAS_WIDTH / 2,
+    y: INITIAL_FROG_Y,
+    isStart: true 
+  });
   const frog = useRef({
     x: CANVAS_WIDTH / 2,
-    y: CANVAS_HEIGHT - 150, // Posisi awal kodok di teratai bawah
+    y: INITIAL_FROG_Y, 
     scale: 1,
     targetX: CANVAS_WIDTH / 2,
-    targetY: CANVAS_HEIGHT - 150,
-    animT: 0, // Waktu animasi 0.0 s/d 1.0
-    action: "IDLE", // IDLE, JUMP, SINK
-    startX: CANVAS_WIDTH / 2, // Posisi X awal lompatan
-    startY: CANVAS_HEIGHT - 150, // Posisi Y awal lompatan
+    targetY: INITIAL_FROG_Y,
+    animT: 0,
+    action: "IDLE", 
+    startX: CANVAS_WIDTH / 2,
+    startY: INITIAL_FROG_Y,
   });
 
-  // Posisi PAD yang MUNGKIN (akan diacak untuk setiap pertanyaan)
   const defaultPadPositions = [
     { x: 200, y: 250 },
     { x: 400, y: 200 },
     { x: 600, y: 250 },
   ];
 
-  // --- INITIALIZATION ON MOUNT ---
-  useEffect(() => {
-    // Inisialisasi posisi pads untuk pertanyaan pertama
-    initializeQuestionPads();
-  }, []); // Hanya berjalan sekali saat komponen dimuat
+  // --- GAMEPLAY HANDLER FUNCTIONS ---
 
-  // --- TIMER LOGIC ---
-  useEffect(() => {
-    if (timer > 0 && !gameOver && gameState.current === "PLAYING") {
-      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
-      return () => clearInterval(interval);
-    } else if (timer === 0 && gameState.current === "PLAYING") {
-      handleWrongAnswer();
-    }
-  }, [timer, gameOver]);
-
-  // --- GAMEPLAY LOGIC ---
+  const resetFrogPosition = () => {
+    // Reset posisi kodok ke currentPlatform terakhir (posisi mutlak di dunia game)
+    frog.current = {
+      x: currentPlatform.current.x,
+      y: currentPlatform.current.y,
+      scale: 1,
+      targetX: currentPlatform.current.x,
+      targetY: currentPlatform.current.y,
+      animT: 0,
+      action: "IDLE",
+      startX: currentPlatform.current.x,
+      startY: currentPlatform.current.y,
+    };
+    gameState.current = "PLAYING";
+    setFeedback("");
+  };
 
   const initializeQuestionPads = () => {
-    // Acak posisi default pads
-    const shuffledPads = shuffleArray([...defaultPadPositions]); // Copy array agar tidak mengubah aslinya
-    // Assign label A, B, C ke pads yang sudah diacak
+    // Posisi pad diatur relatif terhadap yOffset (posisi mutlak di dunia game)
+    // Tujuannya agar pad baru muncul di atas pad yang diduduki saat ini
+    const yShift = currentPlatform.current.y - INITIAL_FROG_Y; 
+
+    const shuffledPads = shuffleArray([...defaultPadPositions]); 
     const labeledPads = shuffledPads.map((pad, idx) => ({
       ...pad,
-      label: String.fromCharCode(65 + idx), // A, B, C
+      // Posisi Y baru dihitung dari posisi mutlak (tergeser)
+      y: pad.y + yShift, 
+      label: String.fromCharCode(65 + idx), 
     }));
     setCurrentPads(labeledPads);
     resetFrogPosition();
+  };
+  
+  const handleWrongAnswer = () => {
+    setFeedback("Waktu Habis/Salah!");
+    if (wrongSound) wrongSound.play();
+    frog.current.action = "SINK";
+    frog.current.animT = 0;
+    
+    setTimeout(() => {
+      if (lives <= 1) { 
+        setGameOver(true);
+        gameState.current = "GAMEOVER";
+        if (gameOverSound) gameOverSound.play();
+      } else {
+        setLives((l) => l - 1); 
+        resetFrogPosition();
+        initializeQuestionPads();
+      }
+    }, 1500);
+  };
+  
+  const nextQuestion = () => {
+    if (questionIndex < allQuestions.length - 1) {
+      setQuestionIndex((prev) => prev + 1);
+      setTimer(20);
+      setFeedback("");
+      initializeQuestionPads(); 
+    } else {
+      setFeedback("Menang!");
+      setGameOver(true);
+      gameState.current = "GAMEOVER";
+      if (gameOverSound) gameOverSound.play();
+    }
   };
 
   const handleAnswer = (selectedIndex) => {
     if (gameState.current !== "PLAYING") return;
 
-    // Temukan index jawaban benar dari pertanyaan saat ini (berdasarkan urutan options asli)
     const currentQuestion = allQuestions[questionIndex];
     const originalCorrectOptionIndex = currentQuestion.ans;
     const correctOptionText = currentQuestion.options[originalCorrectOptionIndex];
-
-    // Dapatkan teks opsi yang diklik dari pertanyaan saat ini
     const clickedOptionText = currentQuestion.options[selectedIndex];
     const clickedPad = currentPads[selectedIndex];
     const isCorrect = clickedOptionText === correctOptionText;
@@ -135,93 +151,60 @@ const FrogQuiz = () => {
       setFeedback("Benar!");
       if (correctSound) correctSound.play();
       if (jumpSound) jumpSound.play();
+      
+      // BARU: Hitung Scroll Target (Geser dunia agar teratai yang diklik menjadi pijakan baru)
+      // Jarak antara teratai yang diklik (clickedPad.y) dan pijakan lama (currentPlatform.current.y)
+      const scrollDistance = clickedPad.y - currentPlatform.current.y; 
+      // Offset baru adalah offset lama dikurangi jarak yang harus digulir
+      scrollTargetY.current = yOffset.current - scrollDistance; 
 
+      // UPDATE POSISI PLATFORM SAAT INI (Mutlak di dunia game)
+      currentPlatform.current = {
+        x: clickedPad.x,
+        y: clickedPad.y,
+        isStart: false
+      };
+
+      // Kodok lompat ke teratai yang diklik (Posisi mutlak)
       frog.current.action = "JUMP";
       frog.current.targetX = clickedPad.x;
       frog.current.targetY = clickedPad.y;
       frog.current.startX = frog.current.x;
       frog.current.startY = frog.current.y;
       frog.current.animT = 0;
+      
+      setPadToHide(selectedIndex); 
 
       setTimeout(() => {
         setScore((s) => s + 100);
+        setPadToHide(null); 
         nextQuestion();
       }, 1500);
     } else {
-      setFeedback("Salah!");
-      if (wrongSound) wrongSound.play();
-      frog.current.action = "SINK";
-      frog.current.animT = 0;
-
-      setTimeout(() => {
-        // PERBAIKAN ERROR no-undef: Cek sebelum mengurangi life
-        if (lives <= 1) { 
-          setGameOver(true);
-          gameState.current = "GAMEOVER";
-          if (gameOverSound) gameOverSound.play();
-        } else {
-          setLives((l) => l - 1); // Kurangi lives dengan updater function
-          resetFrogPosition();
-          initializeQuestionPads(); // Acak ulang pads untuk pertanyaan yang sama
-        }
-      }, 1500);
+      handleWrongAnswer(); // Gunakan fungsi handler yang sudah terdefinisi
     }
   };
 
-  const nextQuestion = () => {
-    if (questionIndex < allQuestions.length - 1) {
-      setQuestionIndex((prev) => prev + 1);
-      setTimer(20);
-      setFeedback("");
-      initializeQuestionPads(); // Inisialisasi pads baru untuk pertanyaan berikutnya
-    } else {
-      setFeedback("Menang!");
-      setGameOver(true);
-      gameState.current = "GAMEOVER";
-      if (gameOverSound) gameOverSound.play();
+  // --- EFFECTS / LIFECYCLES ---
+  
+  useEffect(() => {
+    initializeQuestionPads();
+  }, []); 
+
+  useEffect(() => {
+    if (timer > 0 && !gameOver && gameState.current === "PLAYING") {
+      const interval = setInterval(() => setTimer((t) => t - 1), 1000);
+      return () => clearInterval(interval);
+    } else if (timer === 0 && gameState.current === "PLAYING") {
+      // Panggilan handleWrongAnswer sekarang sudah valid karena dideklarasikan di atas
+      handleWrongAnswer(); 
     }
-  };
-
-  const handleWrongAnswer = () => {
-    setFeedback("Waktu Habis!");
-    if (wrongSound) wrongSound.play();
-    frog.current.action = "SINK";
-    frog.current.animT = 0;
-    
-    setTimeout(() => {
-      // PERBAIKAN ERROR no-undef: Cek sebelum mengurangi life
-      if (lives <= 1) { 
-        setGameOver(true);
-        gameState.current = "GAMEOVER";
-        if (gameOverSound) gameOverSound.play();
-      } else {
-        setLives((l) => l - 1); // Kurangi lives
-        resetFrogPosition();
-        initializeQuestionPads(); // Acak ulang pads
-      }
-    }, 1500);
-  };
-
-  const resetFrogPosition = () => {
-    frog.current = {
-      x: CANVAS_WIDTH / 2,
-      y: CANVAS_HEIGHT - 150,
-      scale: 1,
-      targetX: CANVAS_WIDTH / 2,
-      targetY: CANVAS_HEIGHT - 150,
-      animT: 0,
-      action: "IDLE",
-      startX: CANVAS_WIDTH / 2,
-      startY: CANVAS_HEIGHT - 150,
-    };
-    gameState.current = "PLAYING";
-    setFeedback("");
-  };
-
+    // Tambahkan lives sebagai dependency karena handleWrongAnswer menggunakannya
+  }, [timer, gameOver, lives]); 
+  
   // --- P5.JS FUNCTIONS ---
 
   const preload = (p5) => {
-    // Memuat file audio dari folder public/sounds
     try {
       jumpSound = new Audio('/sounds/jump.mp3');
       correctSound = new Audio('/sounds/correct.mp3');
@@ -235,35 +218,60 @@ const FrogQuiz = () => {
   const setup = (p5, canvasParentRef) => {
     p5.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).parent(canvasParentRef);
     p5.textAlign(p5.CENTER, p5.CENTER);
-    p5.ellipseMode(p5.CENTER); // Pastikan ellipse digambar dari tengah
+    p5.ellipseMode(p5.CENTER); 
   };
 
   const draw = (p5) => {
+    // 0. UPDATE SCROLL OFFSET
+    // Gerakkan offset Y secara bertahap menuju target
+    yOffset.current = p5.lerp(yOffset.current, scrollTargetY.current, 0.05);
+
     // 1. Background Air
     p5.background(40, 180, 255);
-    // Efek riak air sederhana
-    p5.noFill();
-    p5.stroke(255, 255, 255, 50);
-    p5.strokeWeight(2);
-    for (let i = 0; i < 5; i++) {
-      let size = (p5.frameCount * 1.5 + i * 120) % (CANVAS_WIDTH + 200);
-      p5.ellipse(CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2, size, size * 0.6);
-    }
 
-    // 2. Gambar Teratai (Jawaban)
-    // Gunakan currentPads yang sudah diacak
+    // 2. Geser Seluruh Dunia P5.js
+    p5.push();
+    p5.translate(0, yOffset.current); 
+    
+    // Efek riak air (digambar di dalam translate agar ikut bergeser)
+    p5.noFill();
+    p5.stroke(255, 255, 255, 70); 
+    p5.strokeWeight(2);
+    for (let i = 0; i < 8; i++) { 
+      let xPos = (p5.frameCount * 2 + i * 150) % (CANVAS_WIDTH + 100); 
+      let yPos = CANVAS_HEIGHT / 2 + Math.sin(xPos * 0.01 + p5.frameCount * 0.05) * 50;
+      p5.ellipse(xPos - 50, yPos, 150, 80); 
+    }
+    
+    // 3. Gambar Teratai (Jawaban)
     currentPads.forEach((pad, idx) => {
-      // Tampilkan opsi dari pertanyaan saat ini sesuai urutan pads yang diacak
       const optionText = allQuestions[questionIndex] ? allQuestions[questionIndex].options[idx] : "";
-      drawLilyPad(p5, pad.x, pad.y, 130, optionText, idx);
+      
+      if (padToHide === idx) {
+        // Logika animasi teratai tenggelam
+        let t = frog.current.animT; 
+        let shrinkScale = p5.lerp(1, 0, t); 
+        let sinkY = p5.lerp(pad.y, pad.y + 200, t); 
+        
+        if (shrinkScale > 0.05) { 
+          drawLilyPad(p5, pad.x, sinkY, 130, optionText, idx, shrinkScale);
+        }
+      } else {
+        // Gambar teratai normal
+        drawLilyPad(p5, pad.x, pad.y, 130, optionText, idx, 1);
+      }
     });
 
-    // 3. Gambar Teratai Awal (Base)
-    drawLilyPad(p5, frog.current.startX, frog.current.startY + 50, 150, "Mulai", -1); // +50 untuk sedikit di bawah kodok
+    // 4. Gambar Teratai Awal/Platform Terakhir
+    // Tinggi +50 untuk visual teratai yang lebih besar
+    const platformLabel = currentPlatform.current.isStart ? "Mulai" : `Q${questionIndex + 1}`; 
+    drawLilyPad(p5, currentPlatform.current.x, currentPlatform.current.y + 50, 150, platformLabel, -1, 1); 
 
-    // 4. Update & Gambar Kodok
+    // 5. Update & Gambar Kodok
     updateFrog(p5);
     drawFrog(p5, frog.current.x, frog.current.y, frog.current.scale);
+
+    p5.pop(); // Selesai menggeser
   };
 
   const updateFrog = (p5) => {
@@ -271,39 +279,44 @@ const FrogQuiz = () => {
 
     if (f.action === "JUMP") {
       if (f.animT < 1) {
-        f.animT += 0.05; // Kecepatan lompat
+        f.animT += 0.05; 
         f.x = p5.lerp(f.startX, f.targetX, f.animT);
         let baseY = p5.lerp(f.startY, f.targetY, f.animT);
-        let jumpHeight = Math.sin(f.animT * Math.PI) * 120; // Tinggi lompatan
+        let jumpHeight = Math.sin(f.animT * Math.PI) * 120; 
         f.y = baseY - jumpHeight;
-        f.scale = 1 + Math.sin(f.animT * Math.PI) * 0.2;
+        f.scale = 1 + Math.sin(f.animT * Math.PI) * 0.2; 
       } else {
         f.x = f.targetX;
         f.y = f.targetY;
         f.scale = 1;
-        f.action = "IDLE"; // Kodok kembali IDLE setelah lompat
-        gameState.current = "PLAYING"; // Kembali ke state bermain
+        f.action = "IDLE"; 
       }
     } else if (f.action === "SINK") {
       if (f.scale > 0) {
-        f.scale -= 0.03; // Kecepatan tenggelam
-        f.y += 3; // Turun ke bawah
-        f.y = Math.min(f.y, CANVAS_HEIGHT + 50); // Batasi agar tidak terlalu jauh ke bawah
+        f.scale -= 0.03; 
+        f.y += 3; 
+        f.y = Math.min(f.y, currentPlatform.current.y + 200); 
       } else {
-        f.scale = 0; // Pastikan skala jadi 0 agar hilang
-        // Setelah tenggelam, game state akan diatur di setTimeout handleAnswer/handleWrongAnswer
+        f.scale = 0; 
       }
+    }
+    
+    // Pastikan game state kembali ke PLAYING setelah animasi selesai
+    if (f.action === "IDLE" && gameState.current === "ANIMATING" && padToHide === null) {
+         gameState.current = "PLAYING";
     }
   };
 
   // --- ASSET GAMBAR (Prosedural) ---
 
-  const drawLilyPad = (p5, x, y, size, text, idx) => {
+  const drawLilyPad = (p5, x, y, size, text, idx, scale) => {
     p5.push();
     p5.translate(x, y);
+    p5.scale(scale);
+
     p5.noStroke();
     // Daun Utama
-    p5.fill(34, 139, 34); // Forest Green
+    p5.fill(34, 139, 34); 
     p5.arc(0, 0, size, size, 0.1 * p5.PI, 1.9 * p5.PI, p5.PIE);
     // Detail Urat Daun
     p5.stroke(20, 100, 20);
@@ -312,15 +325,14 @@ const FrogQuiz = () => {
     p5.line(0, 0, size / 2.5, size / 3);
     p5.line(0, 0, size / 2.5, -size / 3);
 
-    // Text Label (A, B, C atau Jawaban)
     if (idx !== -1) {
       p5.noStroke();
       p5.fill(255);
       p5.textSize(14);
       p5.textStyle(p5.BOLD);
       // Label (A, B, C) circle
-      p5.fill(100, 200, 0); // Warna hijau lebih terang
-      p5.circle(0, -size / 2 + 10, 30); // Sedikit lebih rendah
+      p5.fill(100, 200, 0); 
+      p5.circle(0, -size / 2 + 10, 30); 
       p5.fill(255);
       p5.text(["A", "B", "C"][idx], 0, -size / 2 + 10);
 
@@ -328,7 +340,7 @@ const FrogQuiz = () => {
       p5.fill(255);
       p5.textSize(16);
       p5.text(text, 0, 10);
-    } else { // Label untuk teratai "Start"
+    } else { 
         p5.noStroke();
         p5.fill(255);
         p5.textSize(18);
@@ -344,40 +356,32 @@ const FrogQuiz = () => {
     p5.scale(s);
 
     p5.noStroke();
-
     // Kaki Belakang
-    p5.fill(50, 205, 50); // Lime Green
+    p5.fill(50, 205, 50); 
     p5.ellipse(-25, 10, 20, 40);
     p5.ellipse(25, 10, 20, 40);
-
     // Badan
     p5.fill(34, 139, 34);
-    p5.ellipse(0, 0, 60, 50); // Badan bulat
-
-    // Perut (Warna lebih muda)
+    p5.ellipse(0, 0, 60, 50); 
+    // Perut 
     p5.fill(144, 238, 144);
     p5.ellipse(0, 5, 30, 25);
-
     // Mata
     p5.fill(34, 139, 34);
-    p5.circle(-15, -20, 20); // Tonjolan mata kiri
-    p5.circle(15, -20, 20); // Tonjolan mata kanan
-
+    p5.circle(-15, -20, 20); 
+    p5.circle(15, -20, 20); 
     p5.fill(255);
-    p5.circle(-15, -20, 15); // Putih mata
+    p5.circle(-15, -20, 15); 
     p5.circle(15, -20, 15);
-
     p5.fill(0);
-    p5.circle(-15, -20, 5); // Pupil
+    p5.circle(-15, -20, 5); 
     p5.circle(15, -20, 5);
-
     // Mulut (Senyum)
     p5.noFill();
     p5.stroke(0);
     p5.strokeWeight(2);
     p5.arc(0, 0, 20, 20, 0.2 * p5.PI, 0.8 * p5.PI);
-
-    // Tas Ungu (seperti di gambar referensi)
+    // Tas Ungu 
     p5.noStroke();
     p5.fill(128, 0, 128);
     p5.rect(-10, 10, 20, 15, 5);
@@ -386,12 +390,12 @@ const FrogQuiz = () => {
   };
 
   const mousePressed = (p5) => {
-    // Deteksi klik pada pad jawaban
     if (gameState.current === "PLAYING") {
       currentPads.forEach((pad, index) => {
-        let d = p5.dist(p5.mouseX, p5.mouseY, pad.x, pad.y);
+        // Karena pad.x dan pad.y adalah posisi mutlak di dunia game, 
+        // kita harus memperhitungkan yOffset saat menghitung jarak klik
+        let d = p5.dist(p5.mouseX, p5.mouseY, pad.x, pad.y + yOffset.current); 
         if (d < 60) {
-          // 60 adalah radius hit area pad
           handleAnswer(index);
         }
       });
@@ -405,9 +409,9 @@ const FrogQuiz = () => {
       width: `${CANVAS_WIDTH}px`,
       margin: "0 auto",
       fontFamily: "Arial, sans-serif",
-      border: "5px solid #333", // Bingkai game
+      border: "5px solid #333", 
       boxShadow: "0 0 20px rgba(0,0,0,0.5)",
-      overflow: "hidden", // Memastikan elemen tidak keluar dari container
+      overflow: "hidden", 
     },
     header: {
       position: "absolute",
@@ -415,7 +419,7 @@ const FrogQuiz = () => {
       left: 0,
       width: "100%",
       height: "50px",
-      background: "#2e8b57", // Warna hijau gelap
+      background: "#2e8b57", 
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
@@ -428,7 +432,7 @@ const FrogQuiz = () => {
     },
     questionBox: {
       position: "absolute",
-      top: "65px", // Sedikit lebih rendah dari header
+      top: "65px", 
       left: "50%",
       transform: "translateX(-50%)",
       width: "90%",
@@ -444,7 +448,7 @@ const FrogQuiz = () => {
     },
     feedback: {
       position: "absolute",
-      bottom: "20%", // Lebih ke tengah agar terlihat jelas
+      bottom: "20%", 
       left: "50%",
       transform: "translateX(-50%)",
       fontSize: "40px",
@@ -482,6 +486,7 @@ const FrogQuiz = () => {
     }
   };
 
+
   return (
     <div style={styles.container}>
       {/* UI HEADER */}
@@ -497,7 +502,6 @@ const FrogQuiz = () => {
       </div>
 
       {/* QUESTION BOX */}
-      {/* Pastikan pertanyaan hanya ditampilkan jika belum Game Over */}
       {!gameOver && allQuestions[questionIndex] && (
         <div style={styles.questionBox}>
           {allQuestions[questionIndex].q}
