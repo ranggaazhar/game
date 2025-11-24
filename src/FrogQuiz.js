@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from "react";
 import Sketch from "react-p5";
 
 // --- GLOBAL VARIABLES & HELPER FUNCTIONS ---
-// Menggunakan dimensi dinamis untuk Fullscreen
 const CANVAS_WIDTH = window.innerWidth;
 const CANVAS_HEIGHT = window.innerHeight;
 const INITIAL_FROG_Y = CANVAS_HEIGHT * 0.75; // Posisi kodok di 75% tinggi layar
@@ -222,22 +221,51 @@ const FrogQuiz = () => {
     // 0. UPDATE SCROLL OFFSET
     yOffset.current = p5.lerp(yOffset.current, scrollTargetY.current, 0.05);
 
-    // 1. Background Air
-    p5.background(40, 180, 255);
+    // 1. Background Air (Kedalaman)
+    // Lapisan Bawah: Biru Tua (Kedalaman)
+    p5.background(20, 100, 150);
+    
+    // Lapisan Atas: Biru Muda (Permukaan)
+    p5.fill(40, 180, 255);
+    p5.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT); // Isi layar dengan warna permukaan
 
     // 2. Geser Seluruh Dunia P5.js
     p5.push();
     p5.translate(0, yOffset.current);
 
-    // Efek riak air
-    p5.noFill();
-    p5.stroke(255, 255, 255, 70);
-    p5.strokeWeight(2);
-    for (let i = 0; i < 8; i++) {
-      let xPos = (p5.frameCount * 2 + i * 150) % (CANVAS_WIDTH + 100);
-      let yPos = CANVAS_HEIGHT / 2 + Math.sin(xPos * 0.01 + p5.frameCount * 0.05) * 50;
-      p5.ellipse(xPos - 50, yPos, 150, 80);
+    // 2a. EFEK TEKSTUR AIR (Menggunakan Perlin Noise)
+    p5.noStroke();
+    p5.fill(255, 255, 255, 40); // Warna putih transparan untuk highlight
+    
+    let noiseScale = 0.01;
+    let time = p5.frameCount * 0.02;
+
+    for (let y = 0; y < CANVAS_HEIGHT + 100; y += 40) {
+      p5.beginShape();
+      let startX = -10;
+      p5.vertex(startX, y);
+      
+      for (let x = startX; x < CANVAS_WIDTH + 10; x += 10) {
+        let n = p5.noise(x * noiseScale, y * noiseScale, time);
+        // Variasi ketinggian gelombang (riak)
+        let ripple = n * 5 - 2; 
+        p5.vertex(x, y + ripple);
+      }
+      
+      p5.vertex(CANVAS_WIDTH + 10, y);
+      p5.endShape(p5.CLOSE);
     }
+
+    // 2b. Efek riak air (garis-garis seperti sebelumnya, tapi lebih halus)
+    p5.noFill();
+    p5.stroke(255, 255, 255, 100); // Lebih putih dan lebih jelas
+    p5.strokeWeight(1);
+    for (let i = 0; i < 5; i++) {
+      let xPos = (p5.frameCount * 1.5 + i * 200) % (CANVAS_WIDTH + 150);
+      let yPos = CANVAS_HEIGHT / 2 + Math.sin(xPos * 0.01 + p5.frameCount * 0.03) * 30;
+      p5.ellipse(xPos - 50, yPos, 150, 50);
+    }
+
 
     // 3. Gambar Teratai (Jawaban)
     currentPads.forEach((pad, idx) => {
@@ -254,7 +282,6 @@ const FrogQuiz = () => {
         }
       } else {
         // Gambar teratai normal
-        // Tambahkan efek mengambang saat IDLE
         let floatY = (gameState.current === "PLAYING") ? Math.sin(p5.frameCount * 0.03 + idx) * 5 : 0;
         drawLilyPad(p5, pad.x, pad.y + floatY, 130, optionText, idx, 1);
       }
@@ -262,9 +289,9 @@ const FrogQuiz = () => {
 
     // 4. Gambar Teratai Awal/Platform Terakhir
     const platformLabel = currentPlatform.current.isStart ? "Mulai" : `Q${questionIndex}`;
-    // Tambahkan efek mengambang pada platform
     let platformFloatY = (gameState.current === "PLAYING") ? Math.sin(p5.frameCount * 0.03 + 5) * 5 : 0;
-    drawLilyPad(p5, currentPlatform.current.x, currentPlatform.current.y + 50 + platformFloatY, 150, platformLabel, -1, 1);
+    // Posisi Y diubah ke 0 (karena ini adalah platform dasar)
+    drawLilyPad(p5, currentPlatform.current.x, currentPlatform.current.y + 0 + platformFloatY, 150, platformLabel, -1, 1);
 
     // 5. Update & Gambar Kodok
     updateFrog(p5);
@@ -272,6 +299,7 @@ const FrogQuiz = () => {
 
     p5.pop(); // Selesai menggeser
   };
+
 
   const updateFrog = (p5) => {
     const f = frog.current;
@@ -318,56 +346,82 @@ const FrogQuiz = () => {
 
   // --- ASSET GAMBAR (Prosedural) ---
 
+  // FUNGSI INI SUDAH DIMODIFIKASI UNTUK REALISME
   const drawLilyPad = (p5, x, y, size, text, idx, scale) => {
     p5.push();
     p5.translate(x, y);
     p5.scale(scale);
 
-    // Scaling font dan posisi agar proporsional
     const baseSize = 130;
     const sizeRatio = size / baseSize;
+    const padColor = p5.color(34, 139, 34); // Hijau Gelap
+    const lightColor = p5.color(107, 180, 78); // Hijau Lebih Terang
 
+    // --- 1. BAYANGAN (Memberi kedalaman) ---
     p5.noStroke();
-    // Daun Utama
-    p5.fill(34, 139, 34);
-    p5.arc(0, 0, size, size, 0.1 * p5.PI, 1.9 * p5.PI, p5.PIE);
-    // Detail Urat Daun
+    p5.fill(0, 0, 0, 50); // Bayangan hitam transparan
+    p5.ellipse(0, 20 * sizeRatio, size * 1.05, size * 0.4);
+
+    // --- 2. DAUN UTAMA (Bentuk Miring & Gradien) ---
+    p5.noStroke();
+    p5.fill(padColor);
+    p5.arc(0, 0, size, size * 0.7, 0.1 * p5.PI, 1.9 * p5.PI, p5.PIE);
+    
+    // Cahaya di tepi atas
+    p5.fill(lightColor);
+    p5.arc(0, -10 * sizeRatio, size * 0.9, size * 0.65, 0.1 * p5.PI, 1.9 * p5.PI, p5.PIE);
+
+    // --- 3. DETAIL URAT DAUN (Menggunakan curve untuk organik) ---
     p5.stroke(20, 100, 20);
     p5.strokeWeight(2 * sizeRatio);
-    p5.line(0, 0, size / 2.2, 0);
-    p5.line(0, 0, size / 2.5, size / 3);
-    p5.line(0, 0, size / 2.5, -size / 3);
+    p5.noFill();
 
+    // Urat Utama (Vertikal)
+    p5.curve(-size/2, 0, 0, 0, size/2, 0, size/2, 0); 
+
+    // Urat Samping Kiri (dengan bentuk melengkung)
+    p5.curve(-size/2, -size/4, 0, 0, size/3, -size/5, size/2, -size/4);
+    p5.curve(-size/2, size/4, 0, 0, size/3, size/5, size/2, size/4);
+
+    // --- 4. TULISAN/LABEL ---
     if (idx !== -1) {
       p5.noStroke();
       p5.fill(255);
-      p5.textSize(14 * sizeRatio);
+      p5.textSize(16 * sizeRatio);
       p5.textStyle(p5.BOLD);
+
       // Label (A, B, C) circle
-      p5.fill(100, 200, 0);
-      p5.circle(0, -size / 2 + 10 * sizeRatio, 30 * sizeRatio);
+      p5.fill(255, 165, 0); // Oranye untuk menonjol
+      p5.ellipse(0, -size / 2 + 10 * sizeRatio, 35 * sizeRatio, 25 * sizeRatio);
       p5.fill(255);
       p5.text(["A", "B", "C"][idx], 0, -size / 2 + 10 * sizeRatio);
 
       // Konten Jawaban
       p5.fill(255);
-      p5.textSize(16 * sizeRatio);
-      p5.text(text, 0, 10 * sizeRatio);
+      p5.textSize(18 * sizeRatio);
+      p5.text(text, 0, 15 * sizeRatio);
     } else {
       p5.noStroke();
       p5.fill(255);
-      p5.textSize(18 * sizeRatio);
+      p5.textSize(20 * sizeRatio);
       p5.textStyle(p5.BOLD);
       p5.text(text, 0, 0);
     }
     p5.pop();
   };
 
+  // FUNGSI INI SUDAH DIMODIFIKASI UNTUK MENAMBAH BAYANGAN KODOK
   const drawFrog = (p5, x, y, s) => {
     p5.push();
     p5.translate(x, y);
     p5.scale(s);
 
+    // --- 1. BAYANGAN KODOK (Di bawah kodok) ---
+    p5.noStroke();
+    p5.fill(0, 0, 0, 80);
+    p5.ellipse(0, 20, 50, 10);
+
+    // SISA GAMBAR KODOK ASLI
     p5.noStroke();
     // Kaki Belakang
     p5.fill(50, 205, 50);
@@ -417,16 +471,14 @@ const FrogQuiz = () => {
   // --- STYLING (CSS-in-JS sederhana) ---
   const styles = {
     container: {
-      position: "fixed", // Menggunakan fixed agar tidak ada scrollbar
+      position: "fixed", 
       top: 0,
       left: 0,
-      width: "100vw", // Penuh layar
-      height: "100vh", // Penuh layar
+      width: "100vw", 
+      height: "100vh", 
       margin: 0,
       padding: 0,
       fontFamily: "Arial, sans-serif",
-      // Menghilangkan border karena sudah fullscreen
-      // boxShadow: "0 0 20px rgba(0,0,0,0.5)", 
       overflow: "hidden",
     },
     header: {
@@ -434,7 +486,7 @@ const FrogQuiz = () => {
       top: 0,
       left: 0,
       width: "100%",
-      height: "60px", // Dibuat sedikit lebih besar
+      height: "60px", 
       background: "#2e8b57",
       display: "flex",
       justifyContent: "space-between",
@@ -448,12 +500,11 @@ const FrogQuiz = () => {
     },
     questionBox: {
       position: "absolute",
-      // Disesuaikan agar berada di tengah atas, lebih jauh dari header
       top: "100px",
       left: "50%",
       transform: "translateX(-50%)",
-      width: "80%", // Lebih lebar untuk layar besar
-      maxWidth: "600px", // Batasi lebar maksimum
+      width: "80%",
+      maxWidth: "600px",
       background: "#fff",
       padding: "20px",
       borderRadius: "10px",
