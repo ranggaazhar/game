@@ -61,6 +61,7 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
   const [gameOver, setGameOver] = useState(false);
   const [gameStatus, setGameStatus] = useState("PLAYING"); // "PLAYING" | "WIN" | "LOSE"
   const [feedback, setFeedback] = useState("");
+  const [questionBoxHeight, setQuestionBoxHeight] = useState(120);
   
   // Lily pad state
   const [currentPads, setCurrentPads] = useState([]);
@@ -89,18 +90,37 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
     startY: INITIAL_FROG_Y,
   });
 
-  // Default lily pad positions
-  const defaultPadPositions = [
-    { x: CANVAS_WIDTH * 0.25, y: CANVAS_HEIGHT * 0.4 },
-    { x: CANVAS_WIDTH * 0.5, y: CANVAS_HEIGHT * 0.3 },
-    { x: CANVAS_WIDTH * 0.75, y: CANVAS_HEIGHT * 0.4 },
-  ];
+  // Dynamic lily pad positions based on question box height
+  const getPadPositions = () => {
+    const questionAreaBottom = 100 + questionBoxHeight + 50; // top + height + margin
+    const availableHeight = CANVAS_HEIGHT - questionAreaBottom;
+    const verticalSpacing = availableHeight * 0.3;
+    
+    return [
+      { x: CANVAS_WIDTH * 0.25, y: questionAreaBottom + verticalSpacing },
+      { x: CANVAS_WIDTH * 0.5, y: questionAreaBottom + verticalSpacing * 0.5 },
+      { x: CANVAS_WIDTH * 0.75, y: questionAreaBottom + verticalSpacing },
+    ];
+  };
 
   const totalQuestions = questions.length;
 
   // --------------------------------------------------------------------------
   // GAME LOGIC FUNCTIONS
   // --------------------------------------------------------------------------
+
+  /**
+   * Calculate question box height based on text length
+   */
+  const calculateQuestionBoxHeight = (questionText) => {
+    const baseHeight = 120;
+    const charCount = questionText.length;
+    
+    if (charCount <= 50) return baseHeight;
+    if (charCount <= 100) return baseHeight + 40;
+    if (charCount <= 150) return baseHeight + 80;
+    return baseHeight + 120;
+  };
 
   /**
    * Reset frog to current platform position
@@ -125,8 +145,13 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
    * Initialize lily pads for current question
    */
   const initializeQuestionPads = () => {
+    const currentQuestion = questions[questionIndex];
+    const newHeight = calculateQuestionBoxHeight(currentQuestion.q);
+    setQuestionBoxHeight(newHeight);
+    
     const yShift = currentPlatform.current.y - INITIAL_FROG_Y;
-    const shuffledPads = shuffleArray(defaultPadPositions);
+    const padPositions = getPadPositions();
+    const shuffledPads = shuffleArray(padPositions);
     
     const labeledPads = shuffledPads.map((pad, idx) => ({
       ...pad,
@@ -225,12 +250,12 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
   // EFFECTS
   // --------------------------------------------------------------------------
 
-  // Initialize game on mount
+  // Initialize game on mount and when question changes
   useEffect(() => {
     initializeQuestionPads();
-  }, []);
+  }, [questionIndex]);
 
-  // Timer countdown
+  // Timer countdown with visual feedback
   useEffect(() => {
     if (timer > 0 && !gameOver && gameState.current === "PLAYING") {
       const interval = setInterval(() => setTimer((t) => t - 1), 1000);
@@ -239,6 +264,35 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
       handleTimeout();
     }
   }, [timer, gameOver]);
+
+  // Update timer display class for low time warning
+  useEffect(() => {
+    const timerElement = document.querySelector('.timer-display');
+    if (timerElement) {
+      if (timer <= 5) {
+        timerElement.classList.add('low-time');
+      } else {
+        timerElement.classList.remove('low-time');
+      }
+    }
+  }, [timer]);
+
+  // Update pad positions when question box height changes
+  useEffect(() => {
+    if (currentPads.length > 0) {
+      const yShift = currentPlatform.current.y - INITIAL_FROG_Y;
+      const padPositions = getPadPositions();
+      const shuffledPads = shuffleArray(padPositions);
+      
+      const labeledPads = shuffledPads.map((pad, idx) => ({
+        ...pad,
+        y: pad.y + yShift,
+        label: String.fromCharCode(65 + idx),
+      }));
+
+      setCurrentPads(labeledPads);
+    }
+  }, [questionBoxHeight]);
 
   // --------------------------------------------------------------------------
   // P5.JS FUNCTIONS
@@ -587,12 +641,12 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
       if (!isCorrect) {
         // Wrong answer
         frog.current.action = "SINK_AFTER_JUMP";
-        setFeedback("Salah! 😔");
+        setFeedback("Salah!");
         if (wrongSound) wrongSound.play();
       } else {
         // Correct answer
         frog.current.action = "LAND";
-        setFeedback("Benar! 🎉");
+        setFeedback("Benar!");
         if (correctSound) correctSound.play();
 
         // Update platform and scroll
@@ -703,28 +757,41 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
             {"❤️".repeat(lives)}
           </span>
         </div>
-        <div className="header-item timer-display">Time: {timer}s</div>
+        <div className={`header-item timer-display ${timer <= 5 ? 'low-time' : ''}`}>
+          Time: {timer}s
+        </div>
         <div className="header-item score-display">Score: {score}</div>
       </div>
 
       {/* Question Display */}
       {!gameOver && questions[questionIndex] && (
-        <div className="question-box">
+        <div 
+          className="question-box"
+          style={{ height: `${questionBoxHeight}px` }}
+        >
           <div className="question-number">
             Pertanyaan {questionIndex + 1}/{totalQuestions}
           </div>
-          {questions[questionIndex].q}
+          <div className="question-text">
+            {questions[questionIndex].q}
+          </div>
         </div>
       )}
 
       {/* Game Over / Win Overlay */}
       {gameOver && (
         <div className={`game-over-overlay ${gameStatus}`}>
-          <h1>{gameStatus === "WIN" ? "ANDA MENANG! 🎉" : "GAME OVER 😭"}</h1>
-          <h2>Skor Akhir: {score}</h2>
-          <button onClick={onBack} className="restart-button">
-            Menu Level
-          </button>
+          <div className="game-over-content">
+            <h1>{gameStatus === "WIN" ? "ANDA MENANG!" : "GAME OVER"}</h1>
+            <h2>Skor Akhir: {score}</h2>
+            <div className="final-stats">
+              <p>Level: {currentLevel}</p>
+              <p>Pertanyaan Selesai: {questionIndex + 1}/{totalQuestions}</p>
+            </div>
+            <button onClick={onBack} className="restart-button">
+              Menu Level
+            </button>
+          </div>
         </div>
       )}
 

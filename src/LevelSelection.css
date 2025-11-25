@@ -1,126 +1,550 @@
 /* src/styles/LevelSelection.css */
 
-/* --- 1. Container & Card --- */
-
-/* Pastikan elemen dekorasi berada di belakang card */
-.lobby-container > div:not(.lobby-menu-card) {
-      z-index: 1;
+/* --- 1. Container & Background Realistic --- */
+.lobby-container {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #87CEEB 0%, #1E90FF 100%);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
 }
 
+/* Water effect */
+.lobby-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(135, 206, 235, 0.8) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(30, 144, 255, 0.6) 0%, transparent 50%),
+    radial-gradient(circle at 40% 40%, rgba(70, 130, 180, 0.4) 0%, transparent 50%);
+  animation: waterShimmer 8s ease-in-out infinite;
+}
+
+@keyframes waterShimmer {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-5px) scale(1.01); }
+}
+
+/* Water ripples */
+.water-ripple {
+  position: absolute;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: ripple 3s linear infinite;
+}
+
+.water-ripple:nth-child(1) {
+  width: 60px;
+  height: 60px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.water-ripple:nth-child(2) {
+  width: 80px;
+  height: 80px;
+  top: 60%;
+  left: 80%;
+  animation-delay: 1s;
+}
+
+.water-ripple:nth-child(3) {
+  width: 50px;
+  height: 50px;
+  top: 80%;
+  left: 20%;
+  animation-delay: 2s;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* --- 2. Card dengan efek daun teratai --- */
 .level-selection-card {
-    z-index: 10;
-    /* Animasi masuk */
-    animation: fadeInZoom 0.8s ease-out;
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 30px 25px;
+  box-shadow: 
+    0 15px 30px rgba(0, 0, 0, 0.1),
+    0 0 0 6px rgba(76, 175, 80, 0.1),
+    inset 0 2px 4px rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  z-index: 10;
+  animation: fadeInZoom 0.8s ease-out;
+  max-width: 400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.level-selection-card::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  right: -8px;
+  bottom: -8px;
+  background: linear-gradient(45deg, #4CAF50, #8BC34A, #CDDC39);
+  border-radius: 20px;
+  z-index: -1;
+  opacity: 0.1;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+@keyframes borderGlow {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.2; }
 }
 
 @keyframes fadeInZoom {
-0% { 
-opacity: 0; 
-transform: translate(-50%, -50%) scale(0.8); 
-}
-100% { 
-opacity: 1; 
-transform: translate(-50%, -50%) scale(1); 
-}
+  0% { 
+    opacity: 0; 
+    transform: scale(0.9) rotate(-2deg);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) rotate(0deg);
+  }
 }
 
+/* --- 3. Typography yang lebih kecil --- */
 .level-title-animated {
-color: #388e3c; /* Warna hijau kodok */
-font-size: 2.5em;
-margin-bottom: 10px;
-text-shadow: 2px 2px 0 #1e6d42;
+  color: #2E7D32;
+  font-size: 1.8em;
+  margin-bottom: 8px;
+  text-align: center;
+  text-shadow: 
+    2px 2px 0 #1B5E20,
+    4px 4px 8px rgba(0, 0, 0, 0.15);
+  background: linear-gradient(45deg, #2E7D32, #4CAF50);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: titleFloat 3s ease-in-out infinite;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  line-height: 1.2;
+}
+
+@keyframes titleFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-3px); }
 }
 
 .lobby-hint {
-color: #555;
-font-style: italic;
-margin-bottom: 20px;
+  color: #666;
+  font-style: italic;
+  margin-bottom: 20px;
+  font-size: 0.9em;
+  text-align: center;
+  background: rgba(76, 175, 80, 0.08);
+  padding: 8px 16px;
+  border-radius: 20px;
+  border-left: 3px solid #4CAF50;
 }
 
-
-/* --- 2. Tombol Level Selection --- */
+/* --- 4. Tombol Level yang lebih kecil --- */
 .level-buttons-container {
-display: flex;
-flex-direction: column;
-gap: 20px;
-width: 100%;
-max-width: 400px; /* Batasi lebar tombol */
-margin: 30px auto 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  width: 100%;
+  margin: 25px auto 0 auto;
 }
 
 .level-button {
-padding: 18px 30px;
-font-size: 24px;
-font-weight: 800;
-color: white;
-border: none;
-border-radius: 15px;
-cursor: pointer;
-transition: all 0.3s ease;
-text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
-position: relative;
-overflow: hidden;
-display: flex;
-justify-content: space-between;
-align-items: center;
-
-
-opacity: 0;
-transform: translateX(-50px);
-animation: slideIn 0.5s forwards;
+  padding: 16px 20px;
+  font-size: 18px;
+  font-weight: 700;
+  color: white;
+  border: none;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  opacity: 0;
+  transform: translateX(-50px);
+  animation: slideIn 0.5s forwards;
+  box-shadow: 
+    0 6px 0 rgba(0, 0, 0, 0.2),
+    inset 0 1px 3px rgba(255, 255, 255, 0.3);
 }
 
 @keyframes slideIn {
-100% { opacity: 1; transform: translateX(0); }
+  100% { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
 }
 
+/* Efek kilau pada tombol */
+.level-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.3),
+    transparent
+  );
+  transition: left 0.5s;
+}
+
+.level-button:hover::before {
+  left: 100%;
+}
 
 .level-icon {
-font-size: 1.5em;
-transition: transform 0.3s;
+  font-size: 1.3em;
+  transition: all 0.3s ease;
+  filter: drop-shadow(1px 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 .level-button:hover .level-icon {
-transform: rotate(10deg) scale(1.1);
+  transform: rotate(12deg) scale(1.1);
 }
 
-/* Level EASY */
+/* Level EASY - Daun Teratai Hijau */
 .level-button.easy {
-background-color: #4CAF50; 
-box-shadow: 0 7px 0 #388E3C;
+  background: linear-gradient(145deg, #4CAF50, #66BB6A);
+  box-shadow: 
+    0 8px 0 #388E3C,
+    0 10px 15px rgba(56, 142, 60, 0.25);
 }
+
 .level-button.easy:hover {
-transform: translateY(-3px);
-box-shadow: 0 10px 0 #388E3C;
+  transform: translateY(-3px);
+  box-shadow: 
+    0 11px 0 #388E3C,
+    0 13px 18px rgba(56, 142, 60, 0.35);
 }
 
-/* Level MEDIUM */
+/* Level MEDIUM - Bunga Teratai Kuning */
 .level-button.medium {
-background-color: #FFC107; 
-color: #333;
-box-shadow: 0 7px 0 #FF8F00;
-}
-.level-button.medium:hover {
-transform: translateY(-3px);
-box-shadow: 0 10px 0 #FF8F00;
+  background: linear-gradient(145deg, #FFC107, #FFD54F);
+  color: #5D4037;
+  box-shadow: 
+    0 8px 0 #FF8F00,
+    0 10px 15px rgba(255, 143, 0, 0.25);
 }
 
-/* Level HARD */
-.level-button.hard {
-background-color: #D32F2F; 
-box-shadow: 0 7px 0 #B71C1C;
+.level-button.medium:hover {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 11px 0 #FF8F00,
+    0 13px 18px rgba(255, 143, 0, 0.35);
 }
+
+/* Level HARD - Teratai Merah */
+.level-button.hard {
+  background: linear-gradient(145deg, #D32F2F, #F44336);
+  box-shadow: 
+    0 8px 0 #B71C1C,
+    0 10px 15px rgba(183, 28, 28, 0.25);
+}
+
 .level-button.hard:hover {
-transform: translateY(-3px);
-box-shadow: 0 10px 0 #B71C1C;
+  transform: translateY(-3px);
+  box-shadow: 
+    0 11px 0 #B71C1C,
+    0 13px 18px rgba(183, 28, 28, 0.35);
 }
 
 .level-button:active {
-    transform: translateY(2px);
-    box-shadow: 0 5px 0 var(--shadow-color, #333); /* Menggunakan variabel CSS */
+  transform: translateY(2px);
+  transition: all 0.1s ease;
 }
 
-/* Atur shadow-color saat active */
-.level-button.easy:active { --shadow-color: #388E3C; }
-.level-button.medium:active { --shadow-color: #FF8F00; }
-.level-button.hard:active { --shadow-color: #B71C1C; }
+.level-button.easy:active { box-shadow: 0 6px 0 #388E3C; }
+.level-button.medium:active { box-shadow: 0 6px 0 #FF8F00; }
+.level-button.hard:active { box-shadow: 0 6px 0 #B71C1C; }
+
+/* --- 5. Elemen Dekorasi yang Lebih Kecil --- */
+
+/* Awan yang lebih kecil */
+.cloud {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  filter: drop-shadow(0 3px 8px rgba(0, 0, 0, 0.1));
+  z-index: 2;
+}
+
+.cloud-1 {
+  width: 80px;
+  height: 40px;
+  top: 10%;
+  left: 5%;
+  animation: floatCloud 25s linear infinite;
+}
+
+.cloud-1::before,
+.cloud-1::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud-1::before {
+  width: 45px;
+  height: 45px;
+  top: -20px;
+  left: 15px;
+}
+
+.cloud-1::after {
+  width: 35px;
+  height: 35px;
+  top: -15px;
+  right: 15px;
+}
+
+.cloud-2 {
+  width: 100px;
+  height: 50px;
+  top: 20%;
+  right: 8%;
+  animation: floatCloud 30s linear infinite reverse;
+}
+
+.cloud-3 {
+  width: 70px;
+  height: 35px;
+  bottom: 25%;
+  left: 10%;
+  animation: floatCloud 22s linear infinite;
+}
+
+@keyframes floatCloud {
+  0% { transform: translateX(-100px) translateY(0px); }
+  50% { transform: translateX(30px) translateY(-5px); }
+  100% { transform: translateX(-100px) translateY(0px); }
+}
+
+/* Daun Teratai yang lebih kecil */
+.lily-pad {
+  position: absolute;
+  background: linear-gradient(135deg, #4CAF50, #2E7D32);
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 3px 6px rgba(255, 255, 255, 0.3),
+    inset 0 -3px 6px rgba(0, 0, 0, 0.2),
+    0 6px 12px rgba(0, 0, 0, 0.15);
+  z-index: 3;
+  animation: floatLily 8s ease-in-out infinite;
+}
+
+.lily-pad::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, transparent 30%, #81C784 70%);
+  border-radius: 50%;
+}
+
+.lily-pad-1 {
+  width: 70px;
+  height: 70px;
+  bottom: 15%;
+  right: 8%;
+  animation-delay: 0s;
+}
+
+.lily-pad-2 {
+  width: 60px;
+  height: 60px;
+  bottom: 20%;
+  left: 8%;
+  animation-delay: 2s;
+}
+
+.lily-pad-3 {
+  width: 80px;
+  height: 80px;
+  top: 15%;
+  right: 15%;
+  animation-delay: 4s;
+}
+
+@keyframes floatLily {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-6px) rotate(1deg); }
+}
+
+/* Kodok yang lebih kecil */
+.animated-frog {
+  position: absolute;
+  width: 50px;
+  height: 40px;
+  bottom: 20%;
+  left: 15%;
+  z-index: 4;
+  animation: frogJump 10s ease-in-out infinite;
+}
+
+.animated-frog::before {
+  content: '🐸';
+  font-size: 40px;
+  filter: drop-shadow(1px 1px 3px rgba(0, 0, 0, 0.3));
+  animation: frogBlink 4s ease-in-out infinite;
+}
+
+@keyframes frogJump {
+  0%, 100% { 
+    transform: translateY(0px) scaleX(1); 
+  }
+  25% { 
+    transform: translateY(-60px) scaleX(1); 
+  }
+  50% { 
+    transform: translateY(-60px) scaleX(1); 
+  }
+  75% { 
+    transform: translateY(0px) scaleX(-1); 
+  }
+}
+
+@keyframes frogBlink {
+  0%, 96%, 100% { transform: scale(1); }
+  98% { transform: scale(0.9); }
+}
+
+/* Efek gelembung udara kecil */
+.bubble {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  animation: bubbleFloat 8s ease-in infinite;
+  z-index: 1;
+}
+
+.bubble:nth-child(1) {
+  width: 12px;
+  height: 12px;
+  left: 25%;
+  bottom: 12%;
+  animation-delay: 0s;
+}
+
+.bubble:nth-child(2) {
+  width: 10px;
+  height: 10px;
+  left: 65%;
+  bottom: 18%;
+  animation-delay: 2s;
+}
+
+.bubble:nth-child(3) {
+  width: 15px;
+  height: 15px;
+  left: 50%;
+  bottom: 8%;
+  animation-delay: 4s;
+}
+
+@keyframes bubbleFloat {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-80vh) scale(0.2);
+    opacity: 0;
+  }
+}
+
+/* Responsive Design untuk Mobile */
+@media (max-width: 480px) {
+  .lobby-container {
+    padding: 15px;
+  }
+  
+  .level-selection-card {
+    padding: 25px 20px;
+    border-radius: 14px;
+  }
+  
+  .level-title-animated {
+    font-size: 1.6em;
+  }
+  
+  .lobby-hint {
+    font-size: 0.85em;
+    padding: 6px 14px;
+  }
+  
+  .level-button {
+    padding: 14px 18px;
+    font-size: 16px;
+    border-radius: 12px;
+  }
+  
+  .level-buttons-container {
+    gap: 12px;
+    margin-top: 20px;
+  }
+  
+  /* Sembunyikan beberapa elemen dekorasi di mobile */
+  .cloud-3,
+  .lily-pad-3 {
+    display: none;
+  }
+  
+  .animated-frog {
+    width: 40px;
+    height: 32px;
+    bottom: 15%;
+    left: 10%;
+  }
+  
+  .animated-frog::before {
+    font-size: 32px;
+  }
+}
+
+/* Untuk layar sangat kecil */
+@media (max-width: 320px) {
+  .level-selection-card {
+    padding: 20px 15px;
+  }
+  
+  .level-title-animated {
+    font-size: 1.4em;
+  }
+  
+  .level-button {
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
