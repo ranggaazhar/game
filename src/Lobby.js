@@ -72,10 +72,10 @@ const GameLobby = () => {
         return <LevelSelection onSelectLevel={handleSelectLevel} />;
       case "MENU":
       default:
-        return (
+        return (  
           <div className="lobby-container"> 
             <div className="lobby-menu-card"> 
-              <h1 className="lobby-title">🐸 Froggy Quiz Adventure! </h1>
+              <h1 className="lobby-title">Froggy Quiz Adventure! </h1>
               <button
                 className="lobby-play-button"
                 onClick={() => setCurrentGame("LEVEL_SELECTION")}
