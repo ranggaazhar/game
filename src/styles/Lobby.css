@@ -1,0 +1,319 @@
+/* App.css (KODE LENGKAP) */
+
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&display=swap');
+
+/* --- GLOBAL STYLES --- */
+body {
+  margin: 0;
+  overflow: hidden; 
+  font-family: 'Fredoka One', cursive; 
+}
+
+.main-container {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #87ceeb 0%, #a9d4f4 50%, #60a3bc 100%); 
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative; 
+  overflow: hidden; 
+}
+
+/* --- NEW: MUTE BUTTON STYLE --- */
+.mute-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: rgba(255, 255, 255, 0.8);
+    color: #2e8b57;
+    border: 3px solid #2e8b57;
+    border-radius: 8px;
+    transition: all 0.2s;
+    font-weight: bold;
+    z-index: 100; /* Pastikan selalu di atas */
+    font-family: 'Fredoka One', cursive;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.mute-button:hover {
+    background-color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+}
+
+.mute-button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+
+/* --- LOBBY CONTAINER (untuk background animatif) --- */
+.lobby-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 1; 
+}
+
+/* --- MENU CARD --- */
+.lobby-menu-card {
+  padding: 60px 40px;
+  border-radius: 20px; 
+  background: rgba(255, 255, 255, 0.9); 
+  box-shadow: 0 15px 30px rgba(0,0,0,0.3); 
+  text-align: center;
+  border: 6px solid #2e8b57; 
+  z-index: 10; 
+  animation: fadeIn 1s ease-out forwards; 
+  position: relative; 
+}
+
+.lobby-title {
+  color: #2e8b57;
+  font-size: 3.5em; 
+  margin-bottom: 40px;
+  font-family: 'Press Start 2P', cursive; 
+  text-shadow: 4px 4px 0px #4f8a33; 
+  animation: bounceIn 1.5s ease-out; 
+}
+
+.lobby-play-button {
+  display: block;
+  width: 350px; 
+  padding: 20px;
+  margin: 30px auto;
+  font-size: 24px; 
+  cursor: pointer;
+  background-color: #6dbf44;
+  color: white;
+  border: none;
+  border-radius: 12px; 
+  transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+  font-weight: bold;
+  box-shadow: 0 8px 0 #4f8a33; 
+  animation: pulse 2s infinite ease-in-out; 
+}
+
+.lobby-play-button:hover {
+  background-color: #8acb68; 
+  transform: translateY(-3px); 
+  box-shadow: 0 10px 0 #4f8a33; 
+}
+
+.lobby-play-button:active {
+  transform: translateY(2px);
+  box-shadow: 0 4px 0 #4f8a33;
+}
+
+.lobby-hint {
+  font-size: 0.8em;
+  color: #666;
+  margin-top: 20px;
+}
+
+/* --- ANIMASI UMUM --- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes bounceIn {
+  0%, 20%, 40%, 60%, 80%, 100% {
+    transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+  }
+  0% { opacity: 0; transform: scale3d(.3, .3, .3); }
+  20% { transform: scale3d(1.1, 1.1, 1.1); }
+  40% { transform: scale3d(.9, .9, .9); }
+  60% { opacity: 1; transform: scale3d(1.03, 1.03, 1.03); }
+  80% { transform: scale3d(.97, .97, .97); }
+  100% { opacity: 1; transform: scale3d(1, 1, 1); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+/* --- ANIMASI AWAN --- */
+.cloud {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  opacity: 0.8;
+  z-index: 0;
+}
+
+.cloud-1 {
+  width: 150px;
+  height: 80px;
+  top: 10%;
+  left: -20%;
+  animation: moveCloud 20s linear infinite;
+  animation-delay: 0s;
+}
+
+.cloud-1::before, .cloud-1::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+.cloud-1::before { width: 90px; height: 90px; top: -30px; left: 30px; }
+.cloud-1::after { width: 120px; height: 60px; top: -10px; right: 20px; }
+
+.cloud-2 {
+  width: 200px;
+  height: 100px;
+  top: 20%;
+  left: -30%;
+  animation: moveCloud 25s linear infinite;
+  animation-delay: 5s;
+}
+.cloud-2::before, .cloud-2::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+.cloud-2::before { width: 120px; height: 120px; top: -40px; left: 40px; }
+.cloud-2::after { width: 160px; height: 80px; top: -20px; right: 30px; }
+
+.cloud-3 {
+  width: 100px;
+  height: 60px;
+  top: 15%;
+  right: -20%; 
+  animation: moveCloudRight 18s linear infinite;
+  animation-delay: 10s;
+}
+.cloud-3::before, .cloud-3::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+.cloud-3::before { width: 60px; height: 60px; top: -20px; left: 20px; }
+.cloud-3::after { width: 80px; height: 40px; top: -5px; right: 10px; }
+
+
+@keyframes moveCloud {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(calc(100vw + 200px)); } 
+}
+
+@keyframes moveCloudRight {
+  0% { transform: translateX(0%); }
+  100% { transform: translateX(calc(-100vw - 200px)); } 
+}
+
+/* --- ANIMASI TERATAI --- */
+.lily-pad {
+  position: absolute;
+  background-color: #348a34; 
+  border-radius: 50%;
+  width: 100px;
+  height: 40px;
+  bottom: -20px; 
+  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+  z-index: 0;
+  opacity: 0.7;
+  transform-origin: center;
+}
+
+.lily-pad::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #6ab04c, #348a34); 
+}
+
+.lily-pad-1 {
+  left: 10%;
+  width: 120px;
+  height: 50px;
+  animation: floatLilyPad 15s ease-in-out infinite alternate;
+  animation-delay: 0s;
+}
+
+.lily-pad-2 {
+  left: 40%;
+  width: 90px;
+  height: 35px;
+  animation: floatLilyPad 18s ease-in-out infinite alternate;
+  animation-delay: 5s;
+}
+
+.lily-pad-3 {
+  right: 15%;
+  width: 110px;
+  height: 45px;
+  animation: floatLilyPad 16s ease-in-out infinite alternate;
+  animation-delay: 10s;
+}
+
+@keyframes floatLilyPad {
+  0% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-50px) rotate(5deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+
+/* --- MASKOT KODOK ANIMASI --- */
+.animated-frog {
+  position: absolute;
+  width: 80px;
+  height: 60px;
+  background-color: #4CAF50; 
+  border-radius: 50% 50% 30% 30%; 
+  bottom: 50px; 
+  left: 20%;
+  z-index: 5;
+  animation: frogJump 4s ease-in-out infinite; 
+}
+
+.animated-frog::before, .animated-frog::after {
+  content: '';
+  position: absolute;
+  background-color: white;
+  border: 2px solid black;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  top: -10px;
+}
+
+.animated-frog::before { left: 10px; } 
+.animated-frog::after { right: 10px; } 
+
+.animated-frog .eye-pupil::before, .animated-frog .eye-pupil::after {
+    content: '';
+    position: absolute;
+    background-color: black;
+    border-radius: 50%;
+    width: 8px;
+    height: 8px;
+    top: 5px;
+}
+.animated-frog .eye-pupil::before { left: 15px; }
+.animated-frog .eye-pupil::after { right: 15px; }
+
+
+@keyframes frogJump {
+  0% { transform: translate(0, 0) scale(1); }
+  25% { transform: translate(50px, -80px) scale(1.1); }
+  50% { transform: translate(100px, 0) scale(1); }
+  75% { transform: translate(50px, -40px) scale(1.05); }
+  100% { transform: translate(0, 0) scale(1); }
+}
