@@ -1,4 +1,4 @@
-/* App.css (DIPERBARUI - HANYA LOBBY YANG DIPERBAIKI) */
+/* App.css (DIPERBARUI - LOBBY YANG DIPERBAIKI) */
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&display=swap');
 
@@ -133,9 +133,9 @@ body {
   }
 }
 
-/* --- LOBBY MENU CARD --- */
+/* --- LOBBY MENU CARD (DIPERBARUI) --- */
 .lobby-menu-card {
-  padding: 70px 50px;
+  padding: 70px 60px; /* Padding horizontal ditambah */
   border-radius: 30px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
@@ -148,9 +148,10 @@ body {
   z-index: 10;
   animation: lobbyCardAppear 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
   position: relative;
-  max-width: 680px;
-  width: 90%;
+  max-width: 780px; /* Lebar maksimum ditambah dari 680px */
+  width: 85%; /* Lebar relatif ditambah */
   margin: 0 auto;
+  box-sizing: border-box; /* Pastikan padding termasuk dalam width */
 }
 
 .lobby-menu-card::before {
@@ -188,6 +189,7 @@ body {
   }
 }
 
+/* --- LOBBY TITLE (DIPERBARUI) --- */
 .lobby-title {
   color: #2e8b57;
   font-size: 3.8em;
@@ -204,6 +206,9 @@ body {
   line-height: 1.3;
   letter-spacing: 2px;
   position: relative;
+  padding: 0 20px; /* Padding untuk mencegah teks terlalu dekat dengan tepi */
+  word-wrap: break-word; /* Pastikan teks panjang tidak overflow */
+  text-align: center; /* Pastikan teks selalu terpusat */
 }
 
 .lobby-title::after {
@@ -233,10 +238,11 @@ body {
   }
 }
 
+/* --- LOBBY PLAY BUTTON (DIPERBARUI) --- */
 .lobby-play-button {
   display: block;
-  width: 380px;
-  padding: 25px;
+  width: 420px; /* Lebar tombol ditambah dari 380px */
+  padding: 25px 30px; /* Padding horizontal ditambah */
   margin: 35px auto;
   font-size: 26px;
   cursor: pointer;
@@ -255,6 +261,9 @@ body {
   text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
   font-family: 'Fredoka One', cursive;
   letter-spacing: 1px;
+  text-align: center; /* Pastikan teks terpusat */
+  line-height: 1.2; /* Tinggi baris yang optimal */
+  box-sizing: border-box; /* Pastikan padding termasuk dalam width */
 }
 
 .lobby-play-button::before {
@@ -297,18 +306,25 @@ body {
   50% { transform: scale(1.04); }
 }
 
+/* --- LOBBY HINT (DIPERBARUI) --- */
 .lobby-hint {
   font-size: 1em;
   color: #666;
   margin-top: 25px;
   background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(139, 195, 74, 0.1));
-  padding: 12px 22px;
+  padding: 12px 25px; /* Padding horizontal ditambah */
   border-radius: 20px;
   border-left: 4px solid #4CAF50;
   border-right: 4px solid #4CAF50;
   font-style: italic;
   text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
   animation: lobbyHintFade 4s ease-in-out infinite;
+  max-width: 90%; /* Maksimum lebar untuk mencegah terlalu panjang */
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.4; /* Tinggi baris yang lebih baik */
+  text-align: center; /* Teks dipusatkan */
+  box-sizing: border-box; /* Pastikan padding termasuk dalam width */
 }
 
 @keyframes lobbyHintFade {
@@ -520,26 +536,56 @@ body {
   }
 }
 
-/* Responsive Design untuk Lobby */
+/* Responsive Design untuk Lobby (DIPERBARUI) */
 @media (max-width: 768px) {
   .lobby-menu-card {
-    padding: 50px 30px;
+    padding: 50px 35px; /* Padding horizontal ditambah untuk mobile */
     max-width: 90%;
+    width: 85%; /* Lebar relatif ditambah untuk mobile */
   }
   
   .lobby-title {
     font-size: 2.5em;
+    padding: 0 15px; /* Padding untuk mobile */
   }
   
   .lobby-play-button {
-    width: 300px;
+    width: 320px; /* Lebar tombol disesuaikan untuk mobile */
     font-size: 22px;
-    padding: 20px;
+    padding: 20px 25px; /* Padding horizontal ditambah untuk mobile */
   }
   
   .lobby-mute-button {
     padding: 12px 18px;
     font-size: 15px;
     min-width: 130px;
+  }
+  
+  .lobby-hint {
+    padding: 12px 20px; /* Padding horizontal ditambah untuk mobile */
+    font-size: 0.9em; /* Ukuran font sedikit dikurangi untuk mobile */
+  }
+}
+
+@media (max-width: 480px) {
+  .lobby-menu-card {
+    padding: 40px 25px; /* Padding lebih kecil untuk layar sangat kecil */
+    width: 90%; /* Lebar lebih besar untuk layar kecil */
+  }
+  
+  .lobby-title {
+    font-size: 2em; /* Ukuran font lebih kecil untuk layar sangat kecil */
+    padding: 0 10px;
+  }
+  
+  .lobby-play-button {
+    width: 280px; /* Lebar tombol lebih kecil untuk layar sangat kecil */
+    font-size: 20px;
+    padding: 18px 22px;
+  }
+  
+  .lobby-hint {
+    padding: 10px 15px;
+    font-size: 0.85em;
   }
 }

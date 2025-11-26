@@ -1,7 +1,5 @@
-// src/components/LevelSelection.jsx
-
 import React from "react";
-import '../LevelSelection.css';
+import '../styles/LevelSelection.css';
 
 const quizQuestions = {
   EASY: {
@@ -46,44 +44,111 @@ const LevelSelection = ({ onSelectLevel }) => {
   const levels = Object.keys(quizQuestions);
 
   return (
-    <div className="lobby-container"> 
-      {/* Efek riak air */}
-      <div className="water-ripple"></div>
-      <div className="water-ripple"></div>
-      <div className="water-ripple"></div>
+    <div className="level-selection-container">
+      {/* Background Effects */}
+      <div className="water-ripple ripple-1"></div>
+      <div className="water-ripple ripple-2"></div>
+      <div className="water-ripple ripple-3"></div>
       
-      {/* Gelembung udara */}
-      <div className="bubble"></div>
-      <div className="bubble"></div>
-      <div className="bubble"></div>
-      
-      <div className="lobby-menu-card level-selection-card"> 
-        <h1 className="lobby-title level-title-animated">Pilih Level</h1>
-        <p className="lobby-hint">Pilih tantangan sesuai kemampuanmu!</p>
-        
-        <div className="level-buttons-container">
+      {/* Bubbles */}
+      <div className="bubble bubble-1"></div>
+      <div className="bubble bubble-2"></div>
+      <div className="bubble bubble-3"></div>
+      <div className="bubble bubble-4"></div>
+
+      {/* Main Card */}
+      <div className="level-selection-card">
+        {/* Card Header */}
+        <div className="card-header">
+          <div className="title-section">
+            <div className="title-decoration">
+              <div className="decoration-line"></div>
+              <div className="decoration-dot"></div>
+              <div className="decoration-line"></div>
+            </div>
+            <h1 className="main-title">PILIH LEVEL</h1>
+            <p className="subtitle">Pilih tantangan sesuai kemampuan coding-mu!</p>
+          </div>
+        </div>
+
+        {/* Level Cards - Horizontal Layout */}
+        <div className="level-cards-horizontal">
           {levels.map((levelKey, index) => {
             const levelData = quizQuestions[levelKey];
+            
             return (
-              <button 
+              <div 
                 key={levelKey}
-                className={`level-button ${levelKey.toLowerCase()}`} 
-                onClick={() => onSelectLevel(levelData.title, levelData.questions)}
-                style={{ animationDelay: `${index * 0.15}s` }}
+                className={`level-card-horizontal ${levelKey.toLowerCase()}`}
+                style={{ animationDelay: `${index * 0.2}s` }}
               >
-                <span className="level-text">
-                  {levelData.title} ({levelData.questions.length})
-                </span>
-                <span className="level-icon">
-                  {levelKey === 'EASY' ? '🌱' : levelKey === 'MEDIUM' ? '🌸' : '🔥'}
-                </span>
-              </button>
+                <button 
+                  className="level-card-content"
+                  onClick={() => onSelectLevel(levelData.title, levelData.questions)}
+                >
+                  <div className="card-background-glow"></div>
+                  <div className="level-card-main">
+                    {/* Level Header */}
+                    <div className="level-header">
+                      <div className="level-title-section">
+                        <div className="level-badge">{levelData.title}</div>
+                        <div className="level-subtitle">
+                          LEVEL {levelKey === 'EASY' ? 'DASAR' : levelKey === 'MEDIUM' ? 'MENENGAH' : 'LANJUT'}
+                        </div>
+                      </div>
+                      <div className="questions-count">
+                        <span className="count-number">{levelData.questions.length}</span>
+                        <span className="count-label">SOAL</span>
+                      </div>
+                    </div>
+
+                    {/* Difficulty Section */}
+                    <div className="difficulty-section">
+                      <div className="difficulty-header">
+                        <span className="difficulty-title">TINGKAT KESULITAN</span>
+                        <span className="difficulty-percentage">
+                          {levelKey === 'EASY' ? '33%' : levelKey === 'MEDIUM' ? '66%' : '100%'}
+                        </span>
+                      </div>
+                      <div className="difficulty-meter">
+                        <div className="difficulty-track">
+                          <div className={`difficulty-progress ${levelKey.toLowerCase()}`}></div>
+                        </div>
+                        <div className="difficulty-labels">
+                          <span>MUDAH</span>
+                          <span>SEDANG</span>
+                          <span>SULIT</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Spacer untuk mengisi ruang */}
+                    <div className="content-spacer"></div>
+
+                    {/* Action Button */}
+                    <div className="level-action">
+                      <span className="action-text">MULAI QUIZ</span>
+                      <span className="action-arrow">→</span>
+                    </div>
+                  </div>
+                </button>
+              </div>
             );
           })}
         </div>
+
+        {/* Card Footer */}
+        <div className="card-footer">
+          <div className="footer-decoration">
+            <div className="footer-dot"></div>
+            <div className="footer-line"></div>
+            <div className="footer-dot"></div>
+          </div>
+          <p className="footer-text">Setiap level memberikan pengalaman belajar yang berbeda!</p>
+        </div>
       </div>
 
-      {/* Elemen Dekorasi */}
+      {/* Decorative Elements */}
       <div className="cloud cloud-1"></div>
       <div className="cloud cloud-2"></div>
       <div className="cloud cloud-3"></div>
@@ -91,6 +156,10 @@ const LevelSelection = ({ onSelectLevel }) => {
       <div className="lily-pad lily-pad-2"></div>
       <div className="lily-pad lily-pad-3"></div>
       <div className="animated-frog"></div>
+      <div className="water-plant water-plant-1"></div>
+      <div className="water-plant water-plant-2"></div>
+      <div className="floating-leaf leaf-1"></div>
+      <div className="floating-leaf leaf-2"></div>
     </div>
   );
 };

@@ -11,17 +11,22 @@
     padding: 0;
     font-family: 'Poppins', 'Arial Rounded MT Bold', 'Arial', sans-serif;
     overflow: hidden;
-    background: linear-gradient(180deg, #7ad6ff 0%, #1783a8 100%);
+    /* Deep Water Gradient */
+    background: linear-gradient(180deg, #135f99 0%, #0f4c75 100%); 
 }
 
-/* --- 2. Header Score/Lives --- */
+/* --- 2. Header Score/Lives (Glassmorphism) --- */
 .quiz-header {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 80px;
-    background: linear-gradient(180deg, #38a865 0%, #297a4d 100%); 
+    /* Semi-transparent Green Glass */
+    background: rgba(41, 122, 77, 0.8); 
+    backdrop-filter: blur(10px); /* Glass effect key */
+    -webkit-backdrop-filter: blur(10px);
+    
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -31,13 +36,11 @@
     z-index: 10;
     font-size: 1.3em;
     font-weight: 800;
-    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.7), inset 0 -4px 5px rgba(255, 255, 255, 0.2); 
-    animation: headerFloat 5s ease-in-out infinite alternate; 
-}
-
-@keyframes headerFloat {
-    0% { transform: translateY(0px); }
-    100% { transform: translateY(-8px); }
+    
+    /* Modern Shadow */
+    border-bottom: 3px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.3), inset 0 -4px 5px rgba(255, 255, 255, 0.1); 
+    animation: none; /* Remove floating animation */
 }
 
 .header-item {
@@ -79,7 +82,7 @@
     50% { transform: scale(1.05); } 
 }
 
-/* --- 3. Kotak Pertanyaan (DINAMIS) --- */
+/* --- 3. Kotak Pertanyaan (Soft/Neumorphism Look) --- */
 .question-box {
     position: absolute;
     top: 100px;
@@ -89,24 +92,23 @@
     max-width: 750px;
     min-height: 120px;
     
-    background: linear-gradient(145deg, #ffffff, #f0f8ff);
+    background: #e8f5e9; /* Light, soft green base */
     padding: 20px 30px;
     border-radius: 25px;
     text-align: center;
-    border: 8px solid #a8c385;
-    border-bottom: 12px solid #6dbf44;
+    
+    /* Neumorphic/Soft Shadow */
+    box-shadow: 
+        10px 10px 20px rgba(0, 0, 0, 0.2), 
+        -5px -5px 15px rgba(255, 255, 255, 0.8),
+        inset 0 0 10px rgba(0, 0, 0, 0.1);
+    
     font-size: 24px;
     font-weight: 700;
     color: #2c3e50;
     z-index: 10;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
     animation: slideDownBounce 1s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     
-    /* Glass effect */
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    
-    /* Dynamic sizing */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -116,7 +118,7 @@
 
 .question-number {
     font-size: 0.75em;
-    color: #7f8c8d;
+    color: #4caf50; /* Green primary color */
     margin-bottom: 8px;
     font-weight: 600;
     text-transform: uppercase;
@@ -133,23 +135,7 @@
     align-items: center;
     justify-content: center;
     padding: 5px 0;
-}
-
-/* Ukuran font responsif berdasarkan panjang teks */
-.question-text.short-text {
-    font-size: 1.2em;
-}
-
-.question-text.medium-text {
-    font-size: 1.1em;
-}
-
-.question-text.long-text {
-    font-size: 0.95em;
-}
-
-.question-text.very-long-text {
-    font-size: 0.85em;
+    color: #384242; /* Soft dark color */
 }
 
 @keyframes slideDownBounce {
@@ -164,10 +150,13 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 80px;
+    font-size: 100px; /* Lebih besar */
     font-weight: 900;
     color: #fff;
-    text-shadow: 0 0 10px #000, 0 0 20px #000, 6px 6px 10px rgba(0, 0, 0, 0.9);
+    text-shadow: 
+        0 0 15px #000, 
+        0 0 30px #000, 
+        10px 10px 15px rgba(0, 0, 0, 0.9);
     z-index: 20;
     animation: feedbackPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
     pointer-events: none;
@@ -179,15 +168,15 @@
     100% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0deg); }
 }
 
-/* --- 5. Game Over Overlay --- */
+/* --- 5. Game Over Overlay (Modern Dark Glass) --- */
 .game-over-overlay {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    backdrop-filter: blur(8px);
-    background: rgba(0,0,0,0.85);
+    background: rgba(15, 76, 117, 0.9); /* Darker blue transparency */
+    backdrop-filter: blur(15px);
     color: white;
     display: flex;
     flex-direction: column;
@@ -200,25 +189,26 @@
 .game-over-content {
     text-align: center;
     padding: 40px;
-    background: linear-gradient(145deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
-    border-radius: 30px;
-    border: 3px solid rgba(255,255,255,0.2);
-    backdrop-filter: blur(15px);
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    border: 1px solid rgba(255,255,255,0.2);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px);
     max-width: 600px;
     width: 90%;
 }
 
 .game-over-overlay h1 {
-    font-size: 4.5em;
-    color: #ffeb3b;
+    font-size: 5em;
+    color: #ffd700; /* Gold */
     margin-bottom: 20px;
-    text-shadow: 6px 6px 0 #cc3700, 8px 8px 5px rgba(0,0,0,0.8);
+    text-shadow: 5px 5px 0 #cc3700, 7px 7px 5px rgba(0,0,0,0.8);
     animation: winJiggle 0.5s ease-in-out infinite alternate;
 }
 
 .game-over-overlay.LOSE h1 {
     color: #ff4500;
-    text-shadow: 6px 6px 0 #8b0000;
+    text-shadow: 5px 5px 0 #8b0000;
     animation: loseShake 0.1s infinite alternate;
 }
 
@@ -232,10 +222,6 @@
     font-size: 1.3em;
     margin: 20px 0;
     color: #ddd;
-}
-
-.final-stats p {
-    margin: 8px 0;
 }
 
 @keyframes winJiggle {
@@ -253,65 +239,65 @@
     to { opacity: 1; }
 }
 
-/* --- 6. Tombol Restart (Menu Level) --- */
+/* --- 6. Tombol Restart (Menu Level) (Modern Green) --- */
 .restart-button {
     padding: 20px 40px;
-    font-size: 28px;
+    font-size: 30px;
     cursor: pointer;
     margin-top: 30px;
-    background: linear-gradient(145deg, #ff6347, #ff4500);
+    background: linear-gradient(145deg, #4caf50, #388e3c);
     color: white;
     border: none;
     border-radius: 15px;
-    box-shadow: 0 10px 0 #cc3700;
+    box-shadow: 0 8px 0 #1b5e20;
     transition: all 0.15s;
     font-weight: 900;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
     text-transform: uppercase;
 }
 
 .restart-button:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 12px 0 #cc3700;
-    background: linear-gradient(145deg, #ff755c, #ff5722);
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 10px 0 #1b5e20;
+    background: linear-gradient(145deg, #66bb6a, #43a047);
 }
 
 .restart-button:active {
-    transform: translateY(5px);
-    box-shadow: 0 5px 0 #cc3700;
+    transform: translateY(4px);
+    box-shadow: 0 4px 0 #1b5e20;
 }
 
-/* --- 7. Tombol Kembali --- */
+/* --- 7. Tombol Kembali (Soft Green/White) --- */
 .back-button {
     position: absolute;
     top: 90px;
     left: 20px;
     padding: 12px 22px;
     font-size: 18px;
-    background: linear-gradient(145deg, #9acd32, #7cb342);
-    color: #2d5016;
-    border: 3px solid #6b8e23;
+    background: #fff;
+    color: #4caf50;
+    border: 2px solid #4caf50;
     border-radius: 50px;
     cursor: pointer;
     z-index: 100;
-    transition: all 0.2s;
-    box-shadow: 0 4px 0 #6b8e23;
-    font-weight: bold;
-    text-shadow: 1px 1px 0 rgba(255, 255, 255, 0.5);
+    transition: all 0.15s;
+    box-shadow: 0 3px 0 #4caf50;
+    font-weight: 800;
+    text-shadow: none;
 }
 
 .back-button:hover {
-    background: linear-gradient(145deg, #c0ee8b, #9acd32);
-    box-shadow: 0 6px 0 #6b8e23;
-    transform: translateY(-2px);
+    background: #e8f5e9;
+    box-shadow: 0 5px 0 #4caf50;
+    transform: translateY(-1px);
 }
 
 .back-button:active {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 #6b8e23;
+    transform: translateY(3px);
+    box-shadow: 0 1px 0 #4caf50;
 }
 
-/* --- 8. Responsive Design --- */
+/* --- 8. Responsive Design --- (Tetap dipertahankan) */
 @media (max-width: 768px) {
     .quiz-header {
         height: 70px;
@@ -353,6 +339,10 @@
     .feedback-text {
         font-size: 60px;
     }
+    
+    .question-text {
+        font-size: 0.95em;
+    }
 }
 
 @media (max-width: 480px) {
@@ -379,6 +369,6 @@
     }
     
     .question-text {
-        font-size: 0.9em;
+        font-size: 0.8em;
     }
 }

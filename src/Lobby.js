@@ -87,7 +87,7 @@ const GameLobby = () => {
             <div className="lobby-container"> {/* Tetap sama */}
               <div className="lobby-menu-card"> {/* Tetap sama */}
                 <h1 className="lobby-title">
-                  Froggy Quiz Adventure! 
+                  Froggy Quiz Adventure
                 </h1>
                 <button
                   className="lobby-play-button"

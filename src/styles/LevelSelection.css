@@ -1,0 +1,1005 @@
+/* ===== PREMIUM FONT IMPORTS ===== */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&display=swap');
+
+/* ===== RESET & BASE STYLES ===== */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* ===== MAIN CONTAINER ===== */
+.level-selection-container {
+  position: relative;
+  min-height: 100vh;
+  background: linear-gradient(135deg, 
+    #0a2a5a 0%,
+    #1e3c72 15%,
+    #2a5298 30%,
+    #1e90ff 50%,
+    #00bfff 70%,
+    #87ceeb 85%,
+    #b0e2ff 100%);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px 20px;
+  font-family: 'Fredoka One', cursive;
+}
+
+/* Water Effect */
+.level-selection-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at 20% 80%, rgba(30, 144, 255, 0.6) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 20%, rgba(0, 191, 255, 0.4) 0%, transparent 40%);
+  animation: waterEffect 15s ease-in-out infinite;
+  z-index: 0;
+}
+
+@keyframes waterEffect {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-15px) scale(1.02); }
+}
+
+/* Water Surface */
+.level-selection-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 2px,
+      transparent 80px
+    );
+  animation: waterSurface 8s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+@keyframes waterSurface {
+  0%, 100% { 
+    transform: translateY(0px);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: translateY(-10px);
+    opacity: 0.9;
+  }
+}
+
+/* ===== MAIN CARD ===== */
+.level-selection-card {
+  position: relative;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(15px);
+  border-radius: 25px;
+  padding: 40px 35px;
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.25),
+    0 0 0 10px rgba(46, 139, 87, 0.12),
+    inset 0 4px 8px rgba(255, 255, 255, 0.9);
+  border: 3px solid rgba(46, 139, 87, 0.25);
+  z-index: 10;
+  animation: cardEntrance 0.8s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  max-width: 1000px;
+  width: 95%;
+  margin: 0 auto;
+}
+
+.level-selection-card::before {
+  content: '';
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  right: -10px;
+  bottom: -10px;
+  background: linear-gradient(45deg, #4CAF50, #8BC34A, #CDDC39);
+  border-radius: 30px;
+  z-index: -1;
+  opacity: 0.08;
+  animation: cardGlow 6s ease-in-out infinite;
+  filter: blur(8px);
+}
+
+@keyframes cardGlow {
+  0%, 100% { opacity: 0.08; }
+  50% { opacity: 0.15; }
+}
+
+@keyframes cardEntrance {
+  0% { 
+    opacity: 0; 
+    transform: translateY(-30px) scale(0.9);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ===== CARD HEADER ===== */
+.card-header {
+  margin-bottom: 40px;
+  position: relative;
+}
+
+.title-section {
+  text-align: center;
+  position: relative;
+}
+
+.title-decoration {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.decoration-line {
+  width: 70px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+}
+
+.decoration-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #4CAF50;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+.main-title {
+  color: #2e8b57;
+  font-size: 2.2em;
+  margin-bottom: 15px;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 
+    4px 4px 0px #1B5E20,
+    6px 6px 15px rgba(0,0,0,0.3);
+  animation: titleEntrance 1.5s ease-out;
+  background: linear-gradient(135deg, #2E7D32, #4CAF50, #66BB6A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.2;
+  letter-spacing: 1.5px;
+  position: relative;
+}
+
+.main-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 60%;
+  height: 4px;
+  background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+  border-radius: 2px;
+}
+
+@keyframes titleEntrance {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.8) translateY(-50px) rotate(-5deg);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+.subtitle {
+  font-size: 1.1em;
+  color: #666;
+  margin-top: 20px;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.12), rgba(139, 195, 74, 0.08));
+  padding: 12px 24px;
+  border-radius: 20px;
+  border-left: 4px solid #4CAF50;
+  border-right: 4px solid #4CAF50;
+  font-style: italic;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
+  animation: hintFade 4s ease-in-out infinite;
+  font-family: 'Fredoka One', cursive;
+}
+
+@keyframes hintFade {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* ===== HORIZONTAL LEVEL CARDS ===== */
+.level-cards-horizontal {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  width: 100%;
+  margin: 35px auto;
+}
+
+.level-card-horizontal {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: cardSlideUp 0.6s forwards;
+}
+
+@keyframes cardSlideUp {
+  100% { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+.level-card-horizontal .level-card-content {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  padding: 0;
+  border: none;
+  border-radius: 22px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+  box-shadow: 
+    0 12px 25px rgba(0, 0, 0, 0.2),
+    0 6px 15px rgba(0, 0, 0, 0.15),
+    inset 0 2px 6px rgba(255, 255, 255, 0.4);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  font-family: 'Fredoka One', cursive;
+}
+
+.card-background-glow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 22px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.level-card-content:hover .card-background-glow {
+  opacity: 1;
+}
+
+.level-card-main {
+  position: relative;
+  z-index: 2;
+  padding: 30px 25px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Level Header */
+.level-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 30px;
+}
+
+.level-title-section {
+  text-align: left;
+}
+
+.level-badge {
+  display: inline-block;
+  padding: 10px 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  font-size: 1.2em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  backdrop-filter: blur(10px);
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 2px 2px 3px rgba(0,0,0,0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  margin-bottom: 8px;
+}
+
+.level-subtitle {
+  font-size: 0.85em;
+  opacity: 0.9;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Fredoka One', cursive;
+}
+
+.questions-count {
+  text-align: right;
+  padding-top: 6px;
+}
+
+.count-number {
+  font-size: 2.4em;
+  font-weight: bold;
+  display: block;
+  line-height: 1;
+  margin-bottom: 6px;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 3px 3px 4px rgba(0, 0, 0, 0.15);
+}
+
+.count-label {
+  font-size: 0.8em;
+  opacity: 0.9;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  font-family: 'Fredoka One', cursive;
+}
+
+/* Difficulty Section */
+.difficulty-section {
+  margin-bottom: 30px;
+}
+
+.difficulty-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.difficulty-title {
+  font-size: 0.85em;
+  opacity: 0.9;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-family: 'Fredoka One', cursive;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.15);
+}
+
+.difficulty-percentage {
+  font-size: 0.8em;
+  font-weight: bold;
+  font-family: 'Press Start 2P', cursive;
+  opacity: 0.9;
+}
+
+.difficulty-meter {
+  width: 100%;
+}
+
+.difficulty-track {
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 10px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.difficulty-progress {
+  height: 100%;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.difficulty-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.7em;
+  opacity: 0.8;
+  font-weight: bold;
+  font-family: 'Fredoka One', cursive;
+  letter-spacing: 0.6px;
+}
+
+/* Content Spacer */
+.content-spacer {
+  flex-grow: 1;
+  margin-bottom: 25px;
+}
+
+/* Level Action */
+.level-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 14px 20px;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: 15px;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(8px);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  font-family: 'Press Start 2P', cursive;
+}
+
+.action-text {
+  font-size: 0.75em;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+.action-arrow {
+  font-size: 1em;
+  font-weight: bold;
+  transition: transform 0.2s ease;
+}
+
+.level-card-content:hover .action-arrow {
+  transform: translateX(5px) scale(1.1);
+}
+
+/* Easy Level */
+.level-card-horizontal.easy .level-card-content {
+  background: linear-gradient(135deg, #66BB6A, #4CAF50, #43A047);
+  color: white;
+}
+
+.level-card-horizontal.easy .card-background-glow {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.35) 0%, transparent 70%);
+}
+
+.level-card-horizontal.easy .difficulty-progress {
+  background: linear-gradient(90deg, #C8E6C9, #A5D6A7, #81C784);
+  width: 33%;
+}
+
+.level-card-horizontal.easy .level-card-content:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 
+    0 15px 30px rgba(76, 175, 80, 0.35),
+    0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Medium Level */
+.level-card-horizontal.medium .level-card-content {
+  background: linear-gradient(135deg, #FFD54F, #FFC107, #FFB300);
+  color: #5D4037;
+}
+
+.level-card-horizontal.medium .card-background-glow {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.45) 0%, transparent 70%);
+}
+
+.level-card-horizontal.medium .difficulty-progress {
+  background: linear-gradient(90deg, #5D4037, #6D4C41, #8D6E63);
+  width: 66%;
+}
+
+.level-card-horizontal.medium .level-card-content:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 
+    0 15px 30px rgba(255, 193, 7, 0.35),
+    0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Hard Level */
+.level-card-horizontal.hard .level-card-content {
+  background: linear-gradient(135deg, #EF5350, #F44336, #E53935);
+  color: white;
+}
+
+.level-card-horizontal.hard .card-background-glow {
+  background: radial-gradient(circle at center, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+}
+
+.level-card-horizontal.hard .difficulty-progress {
+  background: linear-gradient(90deg, #FFCDD2, #EF9A9A, #E57373);
+  width: 100%;
+}
+
+.level-card-horizontal.hard .level-card-content:hover {
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: 
+    0 15px 30px rgba(244, 67, 54, 0.35),
+    0 8px 20px rgba(0, 0, 0, 0.25);
+}
+
+/* Hover Effects */
+.level-card-content:hover .level-action {
+  background: rgba(255, 255, 255, 0.4);
+  transform: translateY(-3px);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.level-card-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.25),
+    transparent
+  );
+  transition: left 0.5s;
+  z-index: 2;
+}
+
+.level-card-content:hover::before {
+  left: 100%;
+}
+
+/* ===== CARD FOOTER ===== */
+.card-footer {
+  margin-top: 35px;
+  text-align: center;
+}
+
+.footer-decoration {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.footer-line {
+  height: 3px;
+  width: 80px;
+  background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+}
+
+.footer-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4CAF50;
+  animation: dotPulse 2s ease-in-out infinite;
+}
+
+.footer-text {
+  font-size: 0.9em;
+  color: #666;
+  font-style: italic;
+  padding: 12px 20px;
+  background: rgba(76, 175, 80, 0.1);
+  border-radius: 18px;
+  border: 1px solid rgba(76, 175, 80, 0.15);
+  font-family: 'Fredoka One', cursive;
+}
+
+/* ===== WATER EFFECTS & DECORATIONS ===== */
+.water-ripple {
+  position: absolute;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: ripple 4s linear infinite;
+}
+
+.ripple-1 {
+  width: 80px;
+  height: 80px;
+  top: 15%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.ripple-2 {
+  width: 100px;
+  height: 100px;
+  top: 70%;
+  left: 85%;
+  animation-delay: 1.5s;
+}
+
+.ripple-3 {
+  width: 60px;
+  height: 60px;
+  top: 85%;
+  left: 15%;
+  animation-delay: 3s;
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+.bubble {
+  position: absolute;
+  background: radial-gradient(circle at 35% 35%, 
+    rgba(255, 255, 255, 0.9) 0%, 
+    rgba(255, 255, 255, 0.4) 50%,
+    rgba(255, 255, 255, 0.1) 100%);
+  border-radius: 50%;
+  animation: bubbleFloat 6s ease-in infinite;
+  z-index: 1;
+  filter: blur(0.5px);
+}
+
+.bubble-1 {
+  width: 16px;
+  height: 16px;
+  left: 20%;
+  bottom: 12%;
+  animation-delay: 0s;
+}
+
+.bubble-2 {
+  width: 12px;
+  height: 12px;
+  left: 70%;
+  bottom: 18%;
+  animation-delay: 1.5s;
+}
+
+.bubble-3 {
+  width: 18px;
+  height: 18px;
+  left: 45%;
+  bottom: 10%;
+  animation-delay: 3s;
+}
+
+.bubble-4 {
+  width: 10px;
+  height: 10px;
+  left: 85%;
+  bottom: 15%;
+  animation-delay: 4.5s;
+}
+
+@keyframes bubbleFloat {
+  0% {
+    transform: translateY(0) scale(1) translateX(0);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-40vh) scale(0.6) translateX(10px);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(-80vh) scale(0.2) translateX(20px);
+    opacity: 0;
+  }
+}
+
+/* Clouds */
+.cloud {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.1));
+  z-index: 2;
+  opacity: 0.8;
+}
+
+.cloud-1 {
+  width: 100px;
+  height: 50px;
+  top: 10%;
+  left: 8%;
+  animation: floatCloud 25s linear infinite;
+}
+
+.cloud-1::before,
+.cloud-1::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+
+.cloud-1::before {
+  width: 55px;
+  height: 55px;
+  top: -25px;
+  left: 25px;
+}
+
+.cloud-1::after {
+  width: 45px;
+  height: 45px;
+  top: -20px;
+  right: 25px;
+}
+
+.cloud-2 {
+  width: 120px;
+  height: 60px;
+  top: 20%;
+  right: 10%;
+  animation: floatCloud 30s linear infinite reverse;
+}
+
+.cloud-3 {
+  width: 90px;
+  height: 45px;
+  bottom: 25%;
+  left: 12%;
+  animation: floatCloud 20s linear infinite;
+}
+
+@keyframes floatCloud {
+  0% { transform: translateX(-120px) translateY(0px); }
+  50% { transform: translateX(40px) translateY(-5px); }
+  100% { transform: translateX(-120px) translateY(0px); }
+}
+
+/* Lily Pads */
+.lily-pad {
+  position: absolute;
+  background: linear-gradient(135deg, #4CAF50, #2E7D32, #1B5E20);
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 4px 8px rgba(255, 255, 255, 0.3),
+    inset 0 -4px 8px rgba(0, 0, 0, 0.2),
+    0 8px 16px rgba(0,0,0,0.2);
+  z-index: 3;
+  animation: floatLily 8s ease-in-out infinite alternate;
+}
+
+.lily-pad::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(circle, transparent 20%, #81C784 60%, #4CAF50 100%);
+  border-radius: 50%;
+  opacity: 0.6;
+}
+
+.lily-pad-1 {
+  width: 100px;
+  height: 50px;
+  bottom: 12%;
+  right: 10%;
+  animation-delay: 0s;
+}
+
+.lily-pad-2 {
+  width: 90px;
+  height: 45px;
+  bottom: 18%;
+  left: 10%;
+  animation-delay: 3s;
+}
+
+.lily-pad-3 {
+  width: 110px;
+  height: 55px;
+  top: 15%;
+  right: 15%;
+  animation-delay: 6s;
+}
+
+@keyframes floatLily {
+  0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  33% { transform: translateY(-15px) rotate(2deg) scale(1.03); }
+  66% { transform: translateY(-8px) rotate(-1deg) scale(0.98); }
+}
+
+/* Frog */
+.animated-frog {
+  position: absolute;
+  width: 60px;
+  height: 48px;
+  bottom: 20%;
+  left: 15%;
+  z-index: 4;
+  animation: frogJump 10s ease-in-out infinite;
+  filter: drop-shadow(2px 2px 6px rgba(0,0,0,0.3));
+}
+
+.animated-frog::before {
+  content: '🐸';
+  font-size: 55px;
+  animation: 
+    frogBlink 4s ease-in-out infinite,
+    frogBreath 1.5s ease-in-out infinite;
+  display: block;
+}
+
+@keyframes frogJump {
+  0%, 100% { transform: translateX(0) translateY(0) scaleX(1); }
+  20% { transform: translateX(100px) translateY(-70px) scaleX(1) rotate(3deg); }
+  40% { transform: translateX(200px) translateY(0) scaleX(1) rotate(0deg); }
+  60% { transform: translateX(300px) translateY(-50px) scaleX(1) rotate(-3deg); }
+  80% { transform: translateX(400px) translateY(0) scaleX(-1) rotate(3deg); }
+}
+
+@keyframes frogBlink {
+  0%, 92%, 100% { transform: scale(1) rotate(0deg); }
+  94% { transform: scale(0.9) rotate(3deg); }
+  96% { transform: scale(1.05) rotate(-3deg); }
+}
+
+@keyframes frogBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+/* Water Plants */
+.water-plant {
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(to top, #4CAF50, #2E7D32, #1B5E20);
+  z-index: 2;
+  border-radius: 1px 1px 0 0;
+}
+
+.water-plant-1 {
+  width: 8px;
+  height: 100px;
+  left: 28%;
+  animation: plantSway 8s ease-in-out infinite;
+}
+
+.water-plant-2 {
+  width: 6px;
+  height: 80px;
+  right: 30%;
+  animation: plantSway 6s ease-in-out infinite reverse;
+}
+
+@keyframes plantSway {
+  0%, 100% { 
+    transform: skewX(2deg) translateY(0px);
+    filter: brightness(1);
+  }
+  50% { 
+    transform: skewX(-2deg) translateY(-5px);
+    filter: brightness(1.1);
+  }
+}
+
+.floating-leaf {
+  position: absolute;
+  background: linear-gradient(135deg, #4CAF50, #66BB6A);
+  border-radius: 50% 50% 50% 0;
+  z-index: 2;
+  animation: leafFloat 15s linear infinite;
+  opacity: 0.6;
+}
+
+.leaf-1 {
+  width: 22px;
+  height: 22px;
+  top: 30%;
+  right: 12%;
+  animation-delay: 0s;
+  transform: rotate(45deg);
+}
+
+.leaf-2 {
+  width: 18px;
+  height: 18px;
+  top: 70%;
+  left: 12%;
+  animation-delay: 7s;
+  transform: rotate(-45deg);
+}
+
+@keyframes leafFloat {
+  0% {
+    transform: translateY(0px) rotate(0deg) scale(1);
+    opacity: 0.6;
+  }
+  25% {
+    transform: translateY(-20px) rotate(90deg) scale(1.05);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-40px) rotate(180deg) scale(1);
+    opacity: 0.6;
+  }
+  75% {
+    transform: translateY(-20px) rotate(270deg) scale(0.95);
+    opacity: 0.4;
+  }
+  100% {
+    transform: translateY(0px) rotate(360deg) scale(1);
+    opacity: 0.6;
+  }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 768px) {
+  .level-cards-horizontal {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    max-width: 350px;
+    margin: 25px auto;
+  }
+  
+  .level-selection-card {
+    padding: 30px 25px;
+    border-radius: 22px;
+  }
+  
+  .main-title {
+    font-size: 1.8em;
+  }
+  
+  .subtitle {
+    font-size: 1em;
+  }
+}
+
+@media (max-width: 480px) {
+  .level-selection-container {
+    padding: 20px 15px;
+  }
+  
+  .level-selection-card {
+    padding: 25px 20px;
+    border-radius: 18px;
+  }
+  
+  .main-title {
+    font-size: 1.5em;
+  }
+  
+  .level-card-horizontal .level-card-content {
+    height: 280px;
+  }
+  
+  .level-card-main {
+    padding: 25px 20px;
+  }
+  
+  /* Hide some decorative elements on mobile */
+  .cloud-3,
+  .lily-pad-3,
+  .water-plant-2,
+  .leaf-2 {
+    display: none;
+  }
+  
+  .animated-frog {
+    width: 50px;
+    height: 40px;
+    bottom: 15%;
+    left: 10%;
+  }
+  
+  .animated-frog::before {
+    font-size: 45px;
+  }
+}
