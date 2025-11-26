@@ -1,4 +1,4 @@
-/* App.css (KODE LENGKAP) */
+/* App.css (DIPERBARUI - HANYA LOBBY YANG DIPERBAIKI) */
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Fredoka+One&display=swap');
 
@@ -9,48 +9,87 @@ body {
   font-family: 'Fredoka One', cursive; 
 }
 
-.main-container {
+/* --- LOBBY STYLES DENGAN PREFIX --- */
+.lobby-main-container {
   min-height: 100vh;
-  background: linear-gradient(to bottom, #87ceeb 0%, #a9d4f4 50%, #60a3bc 100%); 
+  background: linear-gradient(180deg, 
+    #0a2a5a 0%,
+    #1e3c72 15%,
+    #2a5298 30%,
+    #1e90ff 50%,
+    #00bfff 70%,
+    #87ceeb 85%,
+    #b0e2ff 100%
+  );
   display: flex;
   justify-content: center;
   align-items: center;
-  position: relative; 
-  overflow: hidden; 
+  position: relative;
+  overflow: hidden;
 }
 
-/* --- NEW: MUTE BUTTON STYLE --- */
-.mute-button {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    padding: 10px 15px;
-    font-size: 16px;
-    cursor: pointer;
-    background-color: rgba(255, 255, 255, 0.8);
-    color: #2e8b57;
-    border: 3px solid #2e8b57;
-    border-radius: 8px;
-    transition: all 0.2s;
-    font-weight: bold;
-    z-index: 100; /* Pastikan selalu di atas */
-    font-family: 'Fredoka One', cursive;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+/* Water Effect untuk Lobby */
+.lobby-main-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(ellipse at 20% 80%, rgba(30, 144, 255, 0.6) 0%, transparent 40%),
+    radial-gradient(ellipse at 80% 20%, rgba(0, 191, 255, 0.4) 0%, transparent 40%);
+  animation: lobbyWaterEffect 15s ease-in-out infinite;
+  z-index: 0;
 }
 
-.mute-button:hover {
-    background-color: white;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 8px rgba(0,0,0,0.3);
+@keyframes lobbyWaterEffect {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-20px) scale(1.02); }
 }
 
-.mute-button:active {
-    transform: translateY(1px);
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+/* --- LOBBY MUTE BUTTON --- */
+.lobby-mute-button {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  padding: 14px 22px;
+  font-size: 17px;
+  cursor: pointer;
+  background: linear-gradient(145deg, #4CAF50, #66BB6A);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  transition: all 0.4s ease;
+  font-weight: bold;
+  z-index: 1000;
+  font-family: 'Fredoka One', cursive;
+  box-shadow: 
+    0 8px 0 #388E3C,
+    0 12px 25px rgba(0,0,0,0.35);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 140px;
+  justify-content: center;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
 }
 
+.lobby-mute-button:hover {
+  transform: translateY(-4px) scale(1.05);
+  box-shadow: 
+    0 12px 0 #388E3C,
+    0 20px 35px rgba(0,0,0,0.45);
+}
 
-/* --- LOBBY CONTAINER (untuk background animatif) --- */
+.lobby-mute-button.muted {
+  background: linear-gradient(145deg, #D32F2F, #F44336);
+  box-shadow: 
+    0 8px 0 #B71C1C,
+    0 12px 25px rgba(183, 28, 28, 0.35);
+}
+
+/* --- LOBBY CONTAINER --- */
 .lobby-container {
   position: relative;
   width: 100%;
@@ -59,261 +98,448 @@ body {
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  z-index: 1; 
+  z-index: 1;
 }
 
-/* --- MENU CARD --- */
-.lobby-menu-card {
-  padding: 60px 40px;
-  border-radius: 20px; 
-  background: rgba(255, 255, 255, 0.9); 
-  box-shadow: 0 15px 30px rgba(0,0,0,0.3); 
-  text-align: center;
-  border: 6px solid #2e8b57; 
-  z-index: 10; 
-  animation: fadeIn 1s ease-out forwards; 
-  position: relative; 
-}
-
-.lobby-title {
-  color: #2e8b57;
-  font-size: 3.5em; 
-  margin-bottom: 40px;
-  font-family: 'Press Start 2P', cursive; 
-  text-shadow: 4px 4px 0px #4f8a33; 
-  animation: bounceIn 1.5s ease-out; 
-}
-
-.lobby-play-button {
-  display: block;
-  width: 350px; 
-  padding: 20px;
-  margin: 30px auto;
-  font-size: 24px; 
-  cursor: pointer;
-  background-color: #6dbf44;
-  color: white;
-  border: none;
-  border-radius: 12px; 
-  transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
-  font-weight: bold;
-  box-shadow: 0 8px 0 #4f8a33; 
-  animation: pulse 2s infinite ease-in-out; 
-}
-
-.lobby-play-button:hover {
-  background-color: #8acb68; 
-  transform: translateY(-3px); 
-  box-shadow: 0 10px 0 #4f8a33; 
-}
-
-.lobby-play-button:active {
-  transform: translateY(2px);
-  box-shadow: 0 4px 0 #4f8a33;
-}
-
-.lobby-hint {
-  font-size: 0.8em;
-  color: #666;
-  margin-top: 20px;
-}
-
-/* --- ANIMASI UMUM --- */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-50px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes bounceIn {
-  0%, 20%, 40%, 60%, 80%, 100% {
-    transition-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-  }
-  0% { opacity: 0; transform: scale3d(.3, .3, .3); }
-  20% { transform: scale3d(1.1, 1.1, 1.1); }
-  40% { transform: scale3d(.9, .9, .9); }
-  60% { opacity: 1; transform: scale3d(1.03, 1.03, 1.03); }
-  80% { transform: scale3d(.97, .97, .97); }
-  100% { opacity: 1; transform: scale3d(1, 1, 1); }
-}
-
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.03); }
-  100% { transform: scale(1); }
-}
-
-/* --- ANIMASI AWAN --- */
-.cloud {
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  opacity: 0.8;
-  z-index: 0;
-}
-
-.cloud-1 {
-  width: 150px;
-  height: 80px;
-  top: 10%;
-  left: -20%;
-  animation: moveCloud 20s linear infinite;
-  animation-delay: 0s;
-}
-
-.cloud-1::before, .cloud-1::after {
-  content: '';
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-}
-.cloud-1::before { width: 90px; height: 90px; top: -30px; left: 30px; }
-.cloud-1::after { width: 120px; height: 60px; top: -10px; right: 20px; }
-
-.cloud-2 {
-  width: 200px;
-  height: 100px;
-  top: 20%;
-  left: -30%;
-  animation: moveCloud 25s linear infinite;
-  animation-delay: 5s;
-}
-.cloud-2::before, .cloud-2::after {
-  content: '';
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-}
-.cloud-2::before { width: 120px; height: 120px; top: -40px; left: 40px; }
-.cloud-2::after { width: 160px; height: 80px; top: -20px; right: 30px; }
-
-.cloud-3 {
-  width: 100px;
-  height: 60px;
-  top: 15%;
-  right: -20%; 
-  animation: moveCloudRight 18s linear infinite;
-  animation-delay: 10s;
-}
-.cloud-3::before, .cloud-3::after {
-  content: '';
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-}
-.cloud-3::before { width: 60px; height: 60px; top: -20px; left: 20px; }
-.cloud-3::after { width: 80px; height: 40px; top: -5px; right: 10px; }
-
-
-@keyframes moveCloud {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(calc(100vw + 200px)); } 
-}
-
-@keyframes moveCloudRight {
-  0% { transform: translateX(0%); }
-  100% { transform: translateX(calc(-100vw - 200px)); } 
-}
-
-/* --- ANIMASI TERATAI --- */
-.lily-pad {
-  position: absolute;
-  background-color: #348a34; 
-  border-radius: 50%;
-  width: 100px;
-  height: 40px;
-  bottom: -20px; 
-  box-shadow: 0 5px 10px rgba(0,0,0,0.2);
-  z-index: 0;
-  opacity: 0.7;
-  transform-origin: center;
-}
-
-.lily-pad::before {
+/* Water Surface untuk Lobby */
+.lobby-container::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+  background: 
+    repeating-linear-gradient(
+      0deg,
+      rgba(255, 255, 255, 0.1) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 2px,
+      transparent 100px
+    );
+  animation: lobbyWaterSurface 8s ease-in-out infinite;
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+@keyframes lobbyWaterSurface {
+  0%, 100% { 
+    transform: translateY(0px);
+    opacity: 0.7;
+  }
+  50% { 
+    transform: translateY(-15px);
+    opacity: 0.9;
+  }
+}
+
+/* --- LOBBY MENU CARD --- */
+.lobby-menu-card {
+  padding: 70px 50px;
+  border-radius: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  box-shadow: 
+    0 35px 70px rgba(0,0,0,0.25),
+    0 0 0 15px rgba(46, 139, 87, 0.12),
+    inset 0 6px 15px rgba(255, 255, 255, 0.9);
+  text-align: center;
+  border: 4px solid rgba(46, 139, 87, 0.3);
+  z-index: 10;
+  animation: lobbyCardAppear 1.2s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+  position: relative;
+  max-width: 680px;
+  width: 90%;
+  margin: 0 auto;
+}
+
+.lobby-menu-card::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: -15px;
+  right: -15px;
+  bottom: -15px;
+  background: linear-gradient(45deg, #4CAF50, #8BC34A, #CDDC39);
+  border-radius: 40px;
+  z-index: -1;
+  opacity: 0.1;
+  animation: lobbyCardGlow 6s ease-in-out infinite;
+  filter: blur(10px);
+}
+
+@keyframes lobbyCardGlow {
+  0%, 100% { opacity: 0.1; }
+  50% { opacity: 0.2; }
+}
+
+@keyframes lobbyCardAppear {
+  0% { 
+    opacity: 0; 
+    transform: translateY(-50px) scale(0.85);
+  }
+  70% { 
+    opacity: 1; 
+    transform: translateY(10px) scale(1.02);
+  }
+  100% { 
+    opacity: 1; 
+    transform: translateY(0) scale(1);
+  }
+}
+
+.lobby-title {
+  color: #2e8b57;
+  font-size: 3.8em;
+  margin-bottom: 35px;
+  font-family: 'Press Start 2P', cursive;
+  text-shadow: 
+    4px 4px 0px #1B5E20,
+    8px 8px 20px rgba(0,0,0,0.4);
+  animation: lobbyTitleEntrance 2s ease-out;
+  background: linear-gradient(135deg, #2E7D32, #4CAF50, #66BB6A);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.3;
+  letter-spacing: 2px;
+  position: relative;
+}
+
+.lobby-title::after {
+  content: '';
+  position: absolute;
+  bottom: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 5px;
+  background: linear-gradient(90deg, transparent, #4CAF50, transparent);
+  border-radius: 3px;
+}
+
+@keyframes lobbyTitleEntrance {
+  0% { 
+    opacity: 0; 
+    transform: scale(0.3) translateY(-100px) rotate(-10deg);
+  }
+  50% { 
+    opacity: 0.8; 
+    transform: scale(1.2) translateY(20px) rotate(2deg);
+  }
+  100% { 
+    opacity: 1; 
+    transform: scale(1) translateY(0) rotate(0deg);
+  }
+}
+
+.lobby-play-button {
+  display: block;
+  width: 380px;
+  padding: 25px;
+  margin: 35px auto;
+  font-size: 26px;
+  cursor: pointer;
+  background: linear-gradient(145deg, #6dbf44, #8acb68, #9edb7c);
+  color: white;
+  border: none;
+  border-radius: 20px;
+  transition: all 0.4s ease;
+  font-weight: bold;
+  box-shadow: 
+    0 12px 0 #4f8a33,
+    0 20px 35px rgba(79, 138, 51, 0.4);
+  animation: lobbyButtonPulse 3s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+  text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
+  font-family: 'Fredoka One', cursive;
+  letter-spacing: 1px;
+}
+
+.lobby-play-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.4),
+    transparent
+  );
+  transition: left 0.6s;
+}
+
+.lobby-play-button:hover::before {
+  left: 100%;
+}
+
+.lobby-play-button:hover {
+  background: linear-gradient(145deg, #8acb68, #9edb7c, #b2e095);
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 
+    0 17px 0 #4f8a33,
+    0 28px 45px rgba(79, 138, 51, 0.6);
+}
+
+.lobby-play-button:active {
+  transform: translateY(3px);
+  box-shadow: 
+    0 9px 0 #4f8a33,
+    0 12px 20px rgba(79, 138, 51, 0.3);
+}
+
+@keyframes lobbyButtonPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+.lobby-hint {
+  font-size: 1em;
+  color: #666;
+  margin-top: 25px;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.15), rgba(139, 195, 74, 0.1));
+  padding: 12px 22px;
+  border-radius: 20px;
+  border-left: 4px solid #4CAF50;
+  border-right: 4px solid #4CAF50;
+  font-style: italic;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+  animation: lobbyHintFade 4s ease-in-out infinite;
+}
+
+@keyframes lobbyHintFade {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+/* --- LOBBY CLOUDS --- */
+.lobby-cloud {
+  position: absolute;
+  background: white;
   border-radius: 50%;
-  background: radial-gradient(circle at 30% 30%, #6ab04c, #348a34); 
+  filter: drop-shadow(0 8px 25px rgba(0,0,0,0.15));
+  opacity: 0.9;
+  z-index: 2;
+}
+
+.lobby-cloud-1 {
+  width: 180px;
+  height: 90px;
+  top: 12%;
+  left: -18%;
+  animation: lobbyMoveCloud 35s linear infinite;
+}
+
+.lobby-cloud-1::before, .lobby-cloud-1::after {
+  content: '';
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+}
+.lobby-cloud-1::before { width: 100px; height: 100px; top: -40px; left: 30px; }
+.lobby-cloud-1::after { width: 70px; height: 70px; top: -25px; right: 30px; }
+
+.lobby-cloud-2 {
+  width: 220px;
+  height: 110px;
+  top: 22%;
+  left: -25%;
+  animation: lobbyMoveCloud 40s linear infinite;
+  animation-delay: 12s;
+}
+
+.lobby-cloud-3 {
+  width: 150px;
+  height: 75px;
+  top: 18%;
+  right: -20%;
+  animation: lobbyMoveCloudRight 28s linear infinite;
+  animation-delay: 20s;
+}
+
+@keyframes lobbyMoveCloud {
+  0% { transform: translateX(0%) translateY(0px); }
+  100% { transform: translateX(calc(100vw + 300px)) translateY(0px); } 
+}
+
+@keyframes lobbyMoveCloudRight {
+  0% { transform: translateX(0%) translateY(0px); }
+  100% { transform: translateX(calc(-100vw - 300px)) translateY(0px); } 
+}
+
+/* --- LOBBY LILY PADS --- */
+.lobby-lily-pad {
+  position: absolute;
+  background: linear-gradient(135deg, #4CAF50, #2E7D32, #1B5E20);
+  border-radius: 50%;
+  box-shadow: 
+    inset 0 8px 15px rgba(255, 255, 255, 0.4),
+    inset 0 -8px 15px rgba(0, 0, 0, 0.3),
+    0 15px 30px rgba(0,0,0,0.3);
+  z-index: 3;
+  animation: lobbyFloatLilyPad 15s ease-in-out infinite alternate;
+  filter: brightness(1.1);
+}
+
+.lobby-lily-pad::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 65%;
+  height: 65%;
+  background: radial-gradient(circle, transparent 20%, #81C784 60%, #4CAF50 100%);
+  border-radius: 50%;
+  opacity: 0.8;
 }
 
 .lily-pad-1 {
-  left: 10%;
-  width: 120px;
-  height: 50px;
-  animation: floatLilyPad 15s ease-in-out infinite alternate;
+  width: 140px;
+  height: 70px;
+  bottom: 8%;
+  left: 6%;
   animation-delay: 0s;
 }
 
 .lily-pad-2 {
-  left: 40%;
-  width: 90px;
-  height: 35px;
-  animation: floatLilyPad 18s ease-in-out infinite alternate;
+  width: 110px;
+  height: 55px;
+  bottom: 12%;
+  left: 32%;
   animation-delay: 5s;
 }
 
 .lily-pad-3 {
-  right: 15%;
-  width: 110px;
-  height: 45px;
-  animation: floatLilyPad 16s ease-in-out infinite alternate;
+  width: 130px;
+  height: 65px;
+  bottom: 6%;
+  right: 10%;
   animation-delay: 10s;
 }
 
-@keyframes floatLilyPad {
-  0% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-50px) rotate(5deg); }
-  100% { transform: translateY(0) rotate(0deg); }
+@keyframes lobbyFloatLilyPad {
+  0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  33% { transform: translateY(-40px) rotate(4deg) scale(1.08); }
+  66% { transform: translateY(-20px) rotate(-3deg) scale(1.04); }
 }
 
-/* --- MASKOT KODOK ANIMASI --- */
-.animated-frog {
+/* --- LOBBY FROG --- */
+.lobby-animated-frog {
   position: absolute;
-  width: 80px;
-  height: 60px;
-  background-color: #4CAF50; 
-  border-radius: 50% 50% 30% 30%; 
-  bottom: 50px; 
-  left: 20%;
+  width: 90px;
+  height: 65px;
+  bottom: 70px;
+  left: 12%;
   z-index: 5;
-  animation: frogJump 4s ease-in-out infinite; 
+  animation: lobbyFrogJump 8s ease-in-out infinite;
+  filter: drop-shadow(3px 3px 12px rgba(0,0,0,0.4));
 }
 
-.animated-frog::before, .animated-frog::after {
-  content: '';
+.lobby-animated-frog::before {
+  content: '🐸';
+  font-size: 80px;
+  animation: 
+    lobbyFrogBlink 5s ease-in-out infinite,
+    lobbyFrogBreath 2s ease-in-out infinite;
+  display: block;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+@keyframes lobbyFrogJump {
+  0%, 100% { transform: translateX(0) translateY(0) scaleX(1); }
+  15% { transform: translateX(100px) translateY(-120px) scaleX(1) rotate(5deg); }
+  30% { transform: translateX(200px) translateY(0) scaleX(1) rotate(0deg); }
+  45% { transform: translateX(300px) translateY(-80px) scaleX(1) rotate(-5deg); }
+  60% { transform: translateX(400px) translateY(0) scaleX(1) rotate(0deg); }
+  75% { transform: translateX(500px) translateY(-60px) scaleX(-1) rotate(5deg); }
+  90% { transform: translateX(600px) translateY(0) scaleX(-1) rotate(0deg); }
+}
+
+@keyframes lobbyFrogBlink {
+  0%, 94%, 100% { transform: scale(1) rotate(0deg); }
+  96% { transform: scale(0.85) rotate(5deg); }
+  98% { transform: scale(1.1) rotate(-5deg); }
+}
+
+@keyframes lobbyFrogBreath {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+/* --- LOBBY BUBBLES --- */
+.lobby-bubble {
   position: absolute;
-  background-color: white;
-  border: 2px solid black;
+  background: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.3));
   border-radius: 50%;
+  animation: lobbyBubbleFloat 10s ease-in infinite;
+  z-index: 1;
+  filter: blur(0.5px);
+}
+
+.bubble-1 {
   width: 20px;
   height: 20px;
-  top: -10px;
+  left: 20%;
+  bottom: 8%;
+  animation-delay: 0s;
 }
 
-.animated-frog::before { left: 10px; } 
-.animated-frog::after { right: 10px; } 
-
-.animated-frog .eye-pupil::before, .animated-frog .eye-pupil::after {
-    content: '';
-    position: absolute;
-    background-color: black;
-    border-radius: 50%;
-    width: 8px;
-    height: 8px;
-    top: 5px;
+.bubble-2 {
+  width: 16px;
+  height: 16px;
+  left: 55%;
+  bottom: 12%;
+  animation-delay: 3s;
 }
-.animated-frog .eye-pupil::before { left: 15px; }
-.animated-frog .eye-pupil::after { right: 15px; }
 
+.bubble-3 {
+  width: 24px;
+  height: 24px;
+  left: 40%;
+  bottom: 4%;
+  animation-delay: 6s;
+}
 
-@keyframes frogJump {
-  0% { transform: translate(0, 0) scale(1); }
-  25% { transform: translate(50px, -80px) scale(1.1); }
-  50% { transform: translate(100px, 0) scale(1); }
-  75% { transform: translate(50px, -40px) scale(1.05); }
-  100% { transform: translate(0, 0) scale(1); }
+@keyframes lobbyBubbleFloat {
+  0% {
+    transform: translateY(0) scale(1) rotate(0deg);
+    opacity: 0.8;
+  }
+  50% {
+    transform: translateY(-50vh) scale(1.2) rotate(180deg);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(-100vh) scale(0.3) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+/* Responsive Design untuk Lobby */
+@media (max-width: 768px) {
+  .lobby-menu-card {
+    padding: 50px 30px;
+    max-width: 90%;
+  }
+  
+  .lobby-title {
+    font-size: 2.5em;
+  }
+  
+  .lobby-play-button {
+    width: 300px;
+    font-size: 22px;
+    padding: 20px;
+  }
+  
+  .lobby-mute-button {
+    padding: 12px 18px;
+    font-size: 15px;
+    min-width: 130px;
+  }
 }
