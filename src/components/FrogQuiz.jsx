@@ -41,8 +41,8 @@ const shuffleArray = (array) => {
 let jumpSound;
 let correctSound;
 let wrongSound;
-let winSound; // FIX: Suara untuk kemenangan
-let loseSound; // FIX: Suara untuk kekalahan (sebelumnya gameOverSound)
+let winSound;
+let loseSound;
 
 // ============================================================================
 // MAIN COMPONENT
@@ -59,7 +59,7 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
     const [timer, setTimer] = useState(INITIAL_TIMER);
     const [questionIndex, setQuestionIndex] = useState(0);
     const [gameOver, setGameOver] = useState(false);
-    const [gameStatus, setGameStatus] = useState("PLAYING"); // "PLAYING" | "WIN" | "LOSE"
+    const [gameStatus, setGameStatus] = useState("PLAYING");
     const [feedback, setFeedback] = useState("");
     const [questionBoxHeight, setQuestionBoxHeight] = useState(120);
 
@@ -71,6 +71,8 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
     const gameState = useRef("PLAYING");
     const yOffset = useRef(0);
     const scrollTargetY = useRef(0);
+    const timerRef = useRef(null);
+    const animationRef = useRef(null);
 
     const currentPlatform = useRef({
         x: CANVAS_WIDTH / 2,
@@ -85,14 +87,14 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
         targetX: CANVAS_WIDTH / 2,
         targetY: INITIAL_FROG_Y,
         animT: 0,
-        action: "IDLE", // "IDLE" | "JUMP" | "JUMP_TO_CHECK" | "LAND" | "SINK" | "SINK_AFTER_JUMP" | "IDLE_SINKED"
+        action: "IDLE",
         startX: CANVAS_WIDTH / 2,
         startY: INITIAL_FROG_Y,
     });
 
     // Dynamic lily pad positions based on question box height
     const getPadPositions = () => {
-        const questionAreaBottom = 100 + questionBoxHeight + 50; // top + height + margin
+        const questionAreaBottom = 100 + questionBoxHeight + 50;
         const availableHeight = CANVAS_HEIGHT - questionAreaBottom;
         const verticalSpacing = availableHeight * 0.3;
 
@@ -156,7 +158,7 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
         const labeledPads = shuffledPads.map((pad, idx) => ({
             ...pad,
             y: pad.y + yShift,
-            label: String.fromCharCode(65 + idx), // A, B, C
+            label: String.fromCharCode(65 + idx),
         }));
 
         setCurrentPads(labeledPads);
@@ -164,26 +166,21 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
     };
 
     /**
-     * Handle game over or reset after wrong answer (DIPERBAIKI)
+     * Handle game over or reset after wrong answer
      */
     const finishSinkingAndReset = () => {
-        // FIX: Kurangi nyawa di sini, setelah animasi SINK_AFTER_JUMP selesai
-        setLives((l) => l - 1);
+        const newLives = lives - 1;
+        setLives(newLives);
         
-        // PENTING: Cek nyawa menggunakan nilai state yang baru akan diterapkan, 
-        // tapi karena kita berada di dalam closure, kita pakai `lives` yang lama, 
-        // jadi kita cek jika `lives` lama <= 1 (artinya, setelah dikurangi 1 menjadi 0)
-        if (lives <= 1) { 
-            // Game Over - No lives left
+        if (newLives <= 0) {
             setGameOver(true);
             setGameStatus("LOSE");
             gameState.current = "GAMEOVER";
-            if (loseSound) loseSound.play(); // FIX: Putar suara LOSE
+            if (loseSound) loseSound.play();
         } else {
-            // Reset ke posisi awal (pada platform yang sama)
             resetFrogPosition();
             setTimer(INITIAL_TIMER);
-            setPadToHide(null); // FIX: Pastikan pad yang tenggelam kembali muncul
+            setPadToHide(null);
         }
     };
 
@@ -192,19 +189,17 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
      */
     const nextQuestion = () => {
         if (questionIndex < totalQuestions - 1) {
-            // Move to next question
             setQuestionIndex((prev) => prev + 1);
             setTimer(INITIAL_TIMER);
             setFeedback("");
             setPadToHide(null);
             initializeQuestionPads();
         } else {
-            // All questions completed - Win!
             setFeedback("Selamat! Anda Hebat! 🎉");
             setGameOver(true);
             setGameStatus("WIN");
             gameState.current = "GAMEOVER";
-            if (winSound) winSound.play(); // FIX: Putar suara WIN
+            if (winSound) winSound.play();
         }
     };
 
@@ -220,7 +215,6 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
         const clickedPad = currentPads[selectedIndex];
         const isCorrect = clickedOptionText === currentQuestion.options[correctOptionIndex];
 
-        // Start jump animation
         gameState.current = "ANIMATING";
         frog.current.action = "JUMP_TO_CHECK";
         frog.current.targetX = clickedPad.x;
@@ -231,27 +225,33 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
 
         if (jumpSound) jumpSound.play();
 
-        // Mark pad to hide if incorrect
         if (!isCorrect) {
             setPadToHide(selectedIndex);
         }
     };
 
     /**
-     * Handle time out
+     * Handle time out - FIXED VERSION
      */
     const handleTimeout = () => {
-        setFeedback("Waktu Habis! 😭");
+        // Clear timer immediately
+        if (timerRef.current) {
+            clearInterval(timerRef.current);
+            timerRef.current = null;
+        }
+
+        setFeedback("Waktu Habis!");
         if (wrongSound) wrongSound.play();
 
         gameState.current = "ANIMATING";
-        frog.current.action = "SINK"; // Animasi SINK total
+        frog.current.action = "SINK";
 
-        // Karena SINK adalah animasi sederhana tanpa pad, kita panggil finishSinkingAndReset
-        // setelah waktu animasi SINK selesai (misal 1.5s)
-        setTimeout(() => {
+        // Use setTimeout with proper cleanup
+        const timeoutId = setTimeout(() => {
             finishSinkingAndReset();
         }, 1500);
+
+        return () => clearTimeout(timeoutId);
     };
 
     // --------------------------------------------------------------------------
@@ -263,14 +263,27 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
         initializeQuestionPads();
     }, [questionIndex]);
 
-    // Timer countdown with visual feedback
+    // Timer countdown with proper cleanup - FIXED VERSION
     useEffect(() => {
         if (timer > 0 && !gameOver && gameState.current === "PLAYING") {
-            const interval = setInterval(() => setTimer((t) => t - 1), 1000);
-            return () => clearInterval(interval);
-        } else if (timer === 0 && gameState.current === "PLAYING") {
-            handleTimeout();
+            timerRef.current = setInterval(() => {
+                setTimer((t) => {
+                    const newTime = t - 1;
+                    if (newTime <= 0) {
+                        handleTimeout();
+                        return 0;
+                    }
+                    return newTime;
+                });
+            }, 1000);
         }
+
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+        };
     }, [timer, gameOver]);
 
     // Update timer display class for low time warning
@@ -299,8 +312,22 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
         }
     }, [questionBoxHeight]);
 
+    // Cleanup on unmount - FIXED VERSION
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) {
+                clearInterval(timerRef.current);
+                timerRef.current = null;
+            }
+            if (animationRef.current) {
+                cancelAnimationFrame(animationRef.current);
+                animationRef.current = null;
+            }
+        };
+    }, []);
+
     // --------------------------------------------------------------------------
-    // P5.JS FUNCTIONS (ENHANCED)
+    // P5.JS FUNCTIONS (FIXED VERSION)
     // --------------------------------------------------------------------------
 
     /**
@@ -308,14 +335,22 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
      */
     const preload = () => {
         try {
-            // FIX: Ganti path ini jika lokasi file audio Anda berbeda
+            // Use try-catch to prevent audio loading errors
             jumpSound = new Audio("/sounds/jump.mp3"); 
             correctSound = new Audio("/sounds/correct.mp3");
             wrongSound = new Audio("/sounds/wrong.mp3");
-            winSound = new Audio("/sounds/win_fanfare.mp3"); // Tambahkan suara WIN
-            loseSound = new Audio("/sounds/lose_buzz.mp3"); // Tambahkan suara LOSE
+            winSound = new Audio("/sounds/win_fanfare.mp3");
+            loseSound = new Audio("/sounds/lose_buzz.mp3");
+            
+            // Preload audio files
+            [jumpSound, correctSound, wrongSound, winSound, loseSound].forEach(sound => {
+                if (sound) {
+                    sound.load();
+                    sound.volume = 0.7; // Set reasonable volume
+                }
+            });
         } catch (error) {
-            console.error("Error loading sounds:", error);
+            console.warn("Audio loading failed:", error);
         }
     };
 
@@ -323,220 +358,241 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
      * P5.js setup
      */
     const setup = (p5, canvasParentRef) => {
-        p5.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).parent(canvasParentRef);
+        const canvas = p5.createCanvas(CANVAS_WIDTH, CANVAS_HEIGHT).parent(canvasParentRef);
         p5.textAlign(p5.CENTER, p5.CENTER);
         p5.ellipseMode(p5.CENTER);
+        
+        // Prevent context menu on right click
+        canvas.elt.addEventListener('contextmenu', (e) => e.preventDefault());
     };
 
     /**
-     * Draw a lily pad (Enhanced with 3D effect)
+     * Draw a lily pad (FIXED radius calculation)
      */
     const drawLilyPad = (p5, x, y, size, text, idx, scale) => {
         p5.push();
         p5.translate(x, y);
-        p5.scale(scale);
+        
+        // FIX: Ensure scale is never zero or negative
+        const safeScale = Math.max(0.01, scale);
+        p5.scale(safeScale);
 
         const sizeRatio = size / PAD_SIZE;
-        const padDark = p5.color(20, 100, 20); // Darker green
-        const padMid = p5.color(34, 139, 34); // Base green
-        const padLight = p5.color(107, 180, 78); // Light highlight
+        
+        // FIX: Ensure size values are positive
+        const safeSize = Math.max(1, size);
+        const safeSizeRatio = Math.max(0.01, sizeRatio);
 
-        // --- 1. Realistic Shadow (Blur effect with multiple ellipses) ---
+        const padDark = p5.color(20, 100, 20);
+        const padMid = p5.color(34, 139, 34);
+        const padLight = p5.color(107, 180, 78);
+
+        // --- 1. Realistic Shadow ---
         p5.noStroke();
-        for(let i=3; i>0; i--) {
-            p5.fill(0, 0, 0, 10 * i * scale);
-            p5.ellipse(0, 20 * sizeRatio + i * 2, size * 1.05, size * 0.4);
+        for(let i = 3; i > 0; i--) {
+            p5.fill(0, 0, 0, 10 * i * safeScale);
+            // FIX: Ensure ellipse dimensions are positive
+            p5.ellipse(0, 20 * safeSizeRatio, safeSize * 1.05, Math.max(1, safeSize * 0.4));
         }
         
-        // --- 2. Main Leaf Surface (Arc with slight 3D angle) ---
+        // --- 2. Main Leaf Surface ---
         p5.noStroke();
         p5.fill(padMid);
         p5.beginShape();
         const angleStart = 0.1 * p5.PI;
         const angleEnd = 1.9 * p5.PI;
         for (let a = angleStart; a <= angleEnd; a += 0.05) {
-            let r = size / 2 * p5.map(p5.sin(a * 4), -1, 1, 0.95, 1.05); // Organic edge
+            // FIX: Ensure radius is always positive
+            const baseRadius = safeSize / 2;
+            const variation = p5.map(p5.sin(a * 4), -1, 1, 0.95, 1.05);
+            const r = Math.max(1, baseRadius * variation);
             p5.vertex(r * p5.cos(a), r * p5.sin(a) * 0.7);
         }
         p5.endShape(p5.CLOSE);
         
         // --- 3. Dark Edge/Inner Shadow ---
         p5.fill(padDark);
-        p5.arc(0, 0, size * 0.9, size * 0.63, 0.1 * p5.PI, 1.9 * p5.PI, p5.PIE);
+        // FIX: Ensure arc dimensions are positive
+        p5.arc(0, 0, Math.max(1, safeSize * 0.9), Math.max(1, safeSize * 0.63), 0.1 * p5.PI, 1.9 * p5.PI, p5.PIE);
         
-        // --- 4. Light Highlight for Shine ---
+        // --- 4. Light Highlight ---
         p5.fill(padLight, 180);
-        p5.arc(0, -15 * sizeRatio, size * 0.8, size * 0.55, 0.2 * p5.PI, 1.8 * p5.PI, p5.PIE);
+        p5.arc(0, -15 * safeSizeRatio, Math.max(1, safeSize * 0.8), Math.max(1, safeSize * 0.55), 0.2 * p5.PI, 1.8 * p5.PI, p5.PIE);
 
-        // --- 5. Leaf Veins (More prominent) ---
+        // --- 5. Leaf Veins ---
         p5.stroke(padDark);
-        p5.strokeWeight(3 * sizeRatio);
+        // FIX: Ensure stroke weight is positive
+        p5.strokeWeight(Math.max(1, 3 * safeSizeRatio));
         p5.noFill();
-        p5.curve(-size / 2, 0, 0, 0, size / 2, 0, size / 2, 0);
-        p5.curve(-size / 2, -size / 4, 0, 0, size / 3, -size / 5, size / 2, -size / 4);
-        p5.curve(-size / 2, size / 4, 0, 0, size / 3, size / 5, size / 2, size / 4);
+        p5.curve(-safeSize / 2, 0, 0, 0, safeSize / 2, 0, safeSize / 2, 0);
+        p5.curve(-safeSize / 2, -safeSize / 4, 0, 0, safeSize / 3, -safeSize / 5, safeSize / 2, -safeSize / 4);
+        p5.curve(-safeSize / 2, safeSize / 4, 0, 0, safeSize / 3, safeSize / 5, safeSize / 2, safeSize / 4);
 
         // --- 6. Label and text ---
         if (idx !== -1) {
-            // Answer pad with label (A, B, C)
             p5.noStroke();
-            p5.textSize(18 * sizeRatio);
+            // FIX: Ensure text size is positive
+            p5.textSize(Math.max(1, 18 * safeSizeRatio));
             p5.textStyle(p5.BOLD);
 
-            // Label circle (Gold for Modern look)
-            p5.fill(255, 180, 0); // Gold base
-            p5.ellipse(0, -size / 2 + 10 * sizeRatio, 40 * sizeRatio, 30 * sizeRatio);
+            // Label circle
+            p5.fill(255, 180, 0);
+            // FIX: Ensure ellipse dimensions are positive
+            p5.ellipse(0, -safeSize / 2 + 10 * safeSizeRatio, Math.max(1, 40 * safeSizeRatio), Math.max(1, 30 * safeSizeRatio));
             
             // Shine on label
             p5.fill(255, 220, 100);
-            p5.ellipse(0, -size / 2 + 8 * sizeRatio, 30 * sizeRatio, 15 * sizeRatio);
+            p5.ellipse(0, -safeSize / 2 + 8 * safeSizeRatio, Math.max(1, 30 * safeSizeRatio), Math.max(1, 15 * safeSizeRatio));
 
-            p5.fill(50); // Dark text
-            p5.text(["A", "B", "C"][idx], 0, -size / 2 + 10 * sizeRatio);
+            p5.fill(50);
+            p5.text(["A", "B", "C"][idx], 0, -safeSize / 2 + 10 * safeSizeRatio);
 
             // Answer text
             p5.fill(255);
-            p5.textSize(18 * sizeRatio);
+            p5.textSize(Math.max(1, 18 * safeSizeRatio));
             p5.textStyle(p5.NORMAL);
-            p5.text(text, 0, 15 * sizeRatio);
+            p5.text(text, 0, 15 * safeSizeRatio);
         } else {
-            // Platform pad (Start or Q#) - Slightly elevated
             p5.noStroke();
             p5.fill(255);
-            p5.textSize(22 * sizeRatio);
+            p5.textSize(Math.max(1, 22 * safeSizeRatio));
             p5.textStyle(p5.BOLD);
-            p5.text(text, 0, -10 * sizeRatio); // Move text up slightly
+            p5.text(text, 0, -10 * safeSizeRatio);
         }
 
         p5.pop();
     };
 
     /**
-     * Draw the frog character (REALISTIC ENHANCEMENT)
+     * Draw the frog character (FIXED radius calculation)
      */
     const drawFrog = (p5, x, y, scale) => {
-        p5.push();
-        p5.translate(x, y);
-        p5.scale(scale);
+        try {
+            p5.push();
+            p5.translate(x, y);
+            
+            // FIX: Ensure scale is never zero or negative
+            const safeScale = Math.max(0.01, scale);
+            p5.scale(safeScale);
 
-        const frogBodyDark = p5.color(30, 90, 30); // Darker base green
-        const frogBodyMid = p5.color(40, 120, 40); // Mid green
-        const frogBodyLight = p5.color(80, 160, 80); // Lighter highlight green
-        const frogBelly = p5.color(180, 220, 180); // Creamy pale green
-        const eyeIrisColor = p5.color(180, 120, 0); // Amber/Gold for realism
-        const backpackColor = p5.color(100, 50, 150); // Muted purple for backpack
+            const frogBodyDark = p5.color(30, 90, 30);
+            const frogBodyMid = p5.color(40, 120, 40);
+            const frogBodyLight = p5.color(80, 160, 80);
+            const frogBelly = p5.color(180, 220, 180);
+            const eyeIrisColor = p5.color(180, 120, 0);
+            const backpackColor = p5.color(100, 50, 150);
 
-        // --- 1. Realistic Shadow ---
-        p5.noStroke();
-        p5.fill(0, 0, 0, 80); // Softer, wider shadow
-        p5.ellipse(0, 35 * scale, 70 * scale, 20 * scale);
+            // --- 1. Realistic Shadow ---
+            p5.noStroke();
+            p5.fill(0, 0, 0, 80);
+            // FIX: Ensure ellipse dimensions are positive
+            p5.ellipse(0, 35 * safeScale, Math.max(1, 70 * safeScale), Math.max(1, 20 * safeScale));
 
-        // --- 2. Back Legs (More organic, bent) ---
-        p5.fill(frogBodyMid);
-        p5.stroke(frogBodyDark);
-        p5.strokeWeight(2 * scale);
+            // --- 2. Back Legs ---
+            p5.fill(frogBodyMid);
+            p5.stroke(frogBodyDark);
+            // FIX: Ensure stroke weight is positive
+            p5.strokeWeight(Math.max(1, 2 * safeScale));
 
-        // Left back leg
-        p5.beginShape();
-        p5.curveVertex(-30 * scale, 20 * scale); // Control point
-        p5.curveVertex(-35 * scale, 10 * scale); // Start of thigh
-        p5.curveVertex(-45 * scale, 30 * scale); // Knee
-        p5.curveVertex(-30 * scale, 45 * scale); // Ankle/Foot
-        p5.curveVertex(-15 * scale, 35 * scale); // Control point
-        p5.endShape(p5.CLOSE);
+            // Left back leg
+            p5.beginShape();
+            p5.curveVertex(-30 * safeScale, 20 * safeScale);
+            p5.curveVertex(-35 * safeScale, 10 * safeScale);
+            p5.curveVertex(-45 * safeScale, 30 * safeScale);
+            p5.curveVertex(-30 * safeScale, 45 * safeScale);
+            p5.curveVertex(-15 * safeScale, 35 * safeScale);
+            p5.endShape(p5.CLOSE);
 
-        // Right back leg
-        p5.beginShape();
-        p5.curveVertex(30 * scale, 20 * scale); // Control point
-        p5.curveVertex(35 * scale, 10 * scale); // Start of thigh
-        p5.curveVertex(45 * scale, 30 * scale); // Knee
-        p5.curveVertex(30 * scale, 45 * scale); // Ankle/Foot
-        p5.curveVertex(15 * scale, 35 * scale); // Control point
-        p5.endShape(p5.CLOSE);
+            // Right back leg
+            p5.beginShape();
+            p5.curveVertex(30 * safeScale, 20 * safeScale);
+            p5.curveVertex(35 * safeScale, 10 * safeScale);
+            p5.curveVertex(45 * safeScale, 30 * safeScale);
+            p5.curveVertex(30 * safeScale, 45 * safeScale);
+            p5.curveVertex(15 * safeScale, 35 * safeScale);
+            p5.endShape(p5.CLOSE);
 
+            // --- 3. Body ---
+            p5.noStroke();
+            
+            // Darker base for depth
+            p5.fill(frogBodyDark);
+            p5.ellipse(0, 5 * safeScale, Math.max(1, 80 * safeScale), Math.max(1, 70 * safeScale));
 
-        // --- 3. Body (Main mass with smooth transitions and highlights) ---
-        p5.noStroke();
-        
-        // Darker base for depth
-        p5.fill(frogBodyDark);
-        p5.ellipse(0, 5 * scale, 80 * scale, 70 * scale); 
+            // Mid-tone for main body
+            p5.fill(frogBodyMid);
+            p5.ellipse(0, 0, Math.max(1, 75 * safeScale), Math.max(1, 65 * safeScale));
+            
+            // Highlight for roundness
+            p5.fill(frogBodyLight, 200);
+            p5.ellipse(0, -15 * safeScale, Math.max(1, 60 * safeScale), Math.max(1, 50 * safeScale));
 
-        // Mid-tone for main body
-        p5.fill(frogBodyMid);
-        p5.ellipse(0, 0, 75 * scale, 65 * scale); 
-        
-        // Highlight for roundness
-        p5.fill(frogBodyLight, 200);
-        p5.ellipse(0, -15 * scale, 60 * scale, 50 * scale);
+            // --- 4. Belly ---
+            p5.fill(frogBelly);
+            p5.ellipse(0, 10 * safeScale, Math.max(1, 45 * safeScale), Math.max(1, 35 * safeScale));
+            
+            // --- 5. Front Arms ---
+            p5.fill(frogBodyMid);
+            p5.ellipse(-30 * safeScale, -5 * safeScale, Math.max(1, 15 * safeScale), Math.max(1, 30 * safeScale));
+            p5.ellipse(30 * safeScale, -5 * safeScale, Math.max(1, 15 * safeScale), Math.max(1, 30 * safeScale));
 
-        // --- 4. Belly (Softer color) ---
-        p5.fill(frogBelly);
-        p5.ellipse(0, 10 * scale, 45 * scale, 35 * scale);
-        
-        // --- 5. Front Arms (Simple, tucked in) ---
-        p5.fill(frogBodyMid);
-        p5.ellipse(-30 * scale, -5 * scale, 15 * scale, 30 * scale);
-        p5.ellipse(30 * scale, -5 * scale, 15 * scale, 30 * scale);
+            // --- 6. Purple Backpack ---
+            p5.noStroke();
+            p5.fill(p5.red(backpackColor) * 0.7, p5.green(backpackColor) * 0.7, p5.blue(backpackColor) * 0.7);
+            p5.rect(-12 * safeScale, 15 * safeScale, Math.max(1, 24 * safeScale), Math.max(1, 20 * safeScale), Math.max(1, 8 * safeScale));
+            p5.fill(backpackColor);
+            p5.rect(-10 * safeScale, 12 * safeScale, Math.max(1, 20 * safeScale), Math.max(1, 15 * safeScale), Math.max(1, 6 * safeScale));
+            p5.fill(p5.red(backpackColor) * 1.2, p5.green(backpackColor) * 1.2, p5.blue(backpackColor) * 1.2, 100);
+            p5.rect(-8 * safeScale, 10 * safeScale, Math.max(1, 16 * safeScale), Math.max(1, 8 * safeScale), Math.max(1, 4 * safeScale));
 
+            // --- 7. Eyes ---
+            const eyeY = -30 * safeScale;
+            const eyeXOffset = 20 * safeScale;
+            // FIX: Ensure eye size is positive
+            const eyeSize = Math.max(1, 28 * safeScale);
 
-        // --- 6. Purple Backpack (Slightly stylized, less blocky) ---
-        p5.noStroke();
-        // Darker base
-        p5.fill(p5.red(backpackColor) * 0.7, p5.green(backpackColor) * 0.7, p5.blue(backpackColor) * 0.7); 
-        p5.rect(-12 * scale, 15 * scale, 24 * scale, 20 * scale, 8 * scale); 
-        p5.fill(backpackColor); // Main color
-        p5.rect(-10 * scale, 12 * scale, 20 * scale, 15 * scale, 6 * scale); 
-        // Highlight
-        p5.fill(p5.red(backpackColor) * 1.2, p5.green(backpackColor) * 1.2, p5.blue(backpackColor) * 1.2, 100); 
-        p5.rect(-8 * scale, 10 * scale, 16 * scale, 8 * scale, 4 * scale);
+            // Eyestalk/Base
+            p5.fill(frogBodyDark);
+            p5.ellipse(-eyeXOffset, eyeY - 5 * safeScale, Math.max(1, eyeSize * 1.1), Math.max(1, eyeSize * 1.2));
+            p5.ellipse(eyeXOffset, eyeY - 5 * safeScale, Math.max(1, eyeSize * 1.1), Math.max(1, eyeSize * 1.2));
 
+            // Eye Whites
+            p5.fill(240, 240, 240);
+            p5.ellipse(-eyeXOffset, eyeY - 5 * safeScale, Math.max(1, eyeSize * 0.9), Math.max(1, eyeSize));
+            p5.ellipse(eyeXOffset, eyeY - 5 * safeScale, Math.max(1, eyeSize * 0.9), Math.max(1, eyeSize));
 
-        // --- 7. Eyes (More prominent, expressive, and detailed) ---
-        const eyeY = -30 * scale;
-        const eyeXOffset = 20 * scale;
-        const eyeSize = 28 * scale;
+            // Iris
+            p5.fill(eyeIrisColor);
+            p5.ellipse(-eyeXOffset, eyeY - 5 * safeScale, Math.max(1, eyeSize * 0.5), Math.max(1, eyeSize * 0.6));
+            p5.ellipse(eyeXOffset, eyeY - 5 * safeScale, Math.max(1, eyeSize * 0.5), Math.max(1, eyeSize * 0.6));
 
-        // Eyestalk/Base (darker for depth)
-        p5.fill(frogBodyDark);
-        p5.ellipse(-eyeXOffset, eyeY - 5 * scale, eyeSize * 1.1, eyeSize * 1.2);
-        p5.ellipse(eyeXOffset, eyeY - 5 * scale, eyeSize * 1.1, eyeSize * 1.2);
+            // Pupil
+            p5.fill(0);
+            p5.rect(-eyeXOffset - (eyeSize * 0.05), eyeY - 5 * safeScale - (eyeSize * 0.25), Math.max(1, eyeSize * 0.1), Math.max(1, eyeSize * 0.5), Math.max(1, 2 * safeScale));
+            p5.rect(eyeXOffset - (eyeSize * 0.05), eyeY - 5 * safeScale - (eyeSize * 0.25), Math.max(1, eyeSize * 0.1), Math.max(1, eyeSize * 0.5), Math.max(1, 2 * safeScale));
+            
+            // Shine dot/Highlight
+            p5.fill(255, 255, 255, 180);
+            p5.ellipse(-eyeXOffset - eyeSize * 0.15, eyeY - 5 * safeScale - eyeSize * 0.2, Math.max(1, eyeSize * 0.2), Math.max(1, eyeSize * 0.15));
+            p5.ellipse(eyeXOffset - eyeSize * 0.15, eyeY - 5 * safeScale - eyeSize * 0.2, Math.max(1, eyeSize * 0.2), Math.max(1, eyeSize * 0.15));
 
-        // Eye Whites (slightly off-white for realism)
-        p5.fill(240, 240, 240);
-        p5.ellipse(-eyeXOffset, eyeY - 5 * scale, eyeSize * 0.9, eyeSize);
-        p5.ellipse(eyeXOffset, eyeY - 5 * scale, eyeSize * 0.9, eyeSize);
+            // --- 8. Mouth ---
+            p5.noFill();
+            p5.stroke(0);
+            p5.strokeWeight(Math.max(1, 3 * safeScale));
+            p5.curve(
+                -50 * safeScale, 0 * safeScale,
+                -20 * safeScale, 15 * safeScale,
+                20 * safeScale, 15 * safeScale,
+                50 * safeScale, 0 * safeScale
+            );
 
-        // Iris (Amber/Gold for reptilian look)
-        p5.fill(eyeIrisColor); 
-        p5.ellipse(-eyeXOffset, eyeY - 5 * scale, eyeSize * 0.5, eyeSize * 0.6);
-        p5.ellipse(eyeXOffset, eyeY - 5 * scale, eyeSize * 0.5, eyeSize * 0.6);
-
-        // Pupil (Vertical slit for frog-like appearance)
-        p5.fill(0); // Black
-        p5.rect(-eyeXOffset - (eyeSize * 0.05), eyeY - 5 * scale - (eyeSize * 0.25), eyeSize * 0.1, eyeSize * 0.5, 2 * scale); // Slit pupil
-        p5.rect(eyeXOffset - (eyeSize * 0.05), eyeY - 5 * scale - (eyeSize * 0.25), eyeSize * 0.1, eyeSize * 0.5, 2 * scale); 
-        
-        // Shine dot/Highlight
-        p5.fill(255, 255, 255, 180);
-        p5.ellipse(-eyeXOffset - eyeSize * 0.15, eyeY - 5 * scale - eyeSize * 0.2, eyeSize * 0.2, eyeSize * 0.15);
-        p5.ellipse(eyeXOffset - eyeSize * 0.15, eyeY - 5 * scale - eyeSize * 0.2, eyeSize * 0.2, eyeSize * 0.15);
-
-
-        // --- 8. Mouth (More defined curve) ---
-        p5.noFill();
-        p5.stroke(0);
-        p5.strokeWeight(3 * scale);
-        p5.curve(
-            -50 * scale, 0 * scale, // Control point 1
-            -20 * scale, 15 * scale, // Start of mouth
-            20 * scale, 15 * scale, // End of mouth
-            50 * scale, 0 * scale // Control point 2
-        );
-
-        p5.pop();
+            p5.pop();
+        } catch (error) {
+            console.warn('Error drawing frog:', error);
+            // Prevent crash if drawing fails
+        }
     };
-
 
     /**
      * Draw water background with gradient
@@ -557,8 +613,8 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
             inter = p5.constrain(inter, 0, 1);
 
             const c = p5.lerpColor(
-                p5.color(60, 200, 255), // Light blue top
-                p5.color(20, 100, 150), // Darker blue bottom
+                p5.color(60, 200, 255),
+                p5.color(20, 100, 150),
                 inter
             );
             p5.stroke(c);
@@ -567,15 +623,15 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
     };
 
     /**
-     * Draw water surface effects (ripples and waves) - MODIFIED for realism
+     * Draw water surface effects
      */
     const drawWaterEffects = (p5) => {
-        const noiseScale = 0.015; // Finer noise
-        const time = p5.frameCount * 0.015; // Faster movement
+        const noiseScale = 0.015;
+        const time = p5.frameCount * 0.015;
         const yStart = currentPlatform.current.y - CANVAS_HEIGHT * 0.5;
         const yEnd = currentPlatform.current.y + CANVAS_HEIGHT * 0.5;
 
-        // Perlin noise waves - Faint blue lines for depth
+        // Perlin noise waves
         p5.stroke(255, 255, 255, 50);
         p5.strokeWeight(1);
         p5.noFill();
@@ -585,14 +641,14 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
             
             for (let x = 0; x <= CANVAS_WIDTH; x += 20) {
                 const n = p5.noise(x * noiseScale, yWorld * noiseScale * 0.5, time);
-                const rippleHeight = n * 30 - 15; // Deeper ripples
+                const rippleHeight = n * 30 - 15;
                 p5.curveVertex(x, yWorld + rippleHeight);
             }
             
             p5.endShape();
         }
 
-        // Circular ripples (Simplified for cleaner look)
+        // Circular ripples
         p5.noFill();
         p5.stroke(255, 255, 255, 100);
         p5.strokeWeight(1.5);
@@ -602,7 +658,7 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                 currentPlatform.current.y -
                 500 + 
                 i * 200 +
-                Math.sin(p5.frameCount * 0.01 + i) * 50; 
+                Math.sin(p5.frameCount * 0.01 + i) * 50;
             const xPos =
                 CANVAS_WIDTH * 0.5 +
                 Math.cos(p5.frameCount * 0.008 + i * 0.7) * (CANVAS_WIDTH * 0.4);
@@ -625,20 +681,16 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                     : 0;
 
             if (padToHide === idx && frog.current.action === "JUMP_TO_CHECK") {
-                // Keep pad visible during jump
                 drawLilyPad(p5, pad.x, pad.y + floatY, PAD_SIZE, optionText, idx, 1);
             } else if (padToHide === idx) {
-                // Animate sinking pad (after jump check or timeout)
                 let shrinkScale = 1;
                 let sinkY = pad.y;
 
                 if (frog.current.action === "SINK_AFTER_JUMP") {
-                    // Animasi pad tenggelam setelah jawaban salah
                     const progress = p5.constrain((frog.current.y - pad.y) / SINK_DEPTH, 0, 1);
                     shrinkScale = p5.lerp(1, 0, progress);
                     sinkY = p5.lerp(pad.y, pad.y + 200, progress);
                 } else if (frog.current.action === "SINK") {
-                    // Animasi pad tenggelam saat Time Out (SINK total)
                     shrinkScale = p5.lerp(1, 0, frog.current.animT * 2);
                     sinkY = p5.lerp(pad.y, pad.y + 100, frog.current.animT * 2);
                 }
@@ -647,14 +699,13 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                     drawLilyPad(p5, pad.x, sinkY + floatY, PAD_SIZE, optionText, idx, shrinkScale);
                 }
             } else {
-                // Normal pad
                 drawLilyPad(p5, pad.x, pad.y + floatY, PAD_SIZE, optionText, idx, 1);
             }
         });
     };
 
     /**
-     * Update frog animation
+     * Update frog animation (FIXED animation logic)
      */
     const updateFrog = (p5) => {
         const f = frog.current;
@@ -666,21 +717,16 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                     f.animT += JUMP_SPEED;
                     f.animT = p5.constrain(f.animT, 0, 1);
 
-                    // Easing Out (cepat di awal, lambat di akhir)
-                    const easeT = p5.pow(f.animT, 2); 
+                    const easeT = p5.pow(f.animT, 2);
 
-                    // Posisi Horizontal
                     f.x = p5.lerp(f.startX, f.targetX, easeT);
 
-                    // Posisi Vertikal
                     const baseY = p5.lerp(f.startY, f.targetY, f.animT);
                     const jumpHeight = Math.sin(f.animT * p5.PI) * JUMP_HEIGHT;
                     f.y = baseY - jumpHeight;
 
-                    // Scale
                     f.scale = 1 + Math.sin(f.animT * p5.PI) * 0.2;
                 } else {
-                    // Jump complete - land on pad
                     f.x = f.targetX;
                     f.y = f.targetY;
                     f.scale = 1;
@@ -705,19 +751,16 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                 break;
 
             case "SINK_AFTER_JUMP":
-                // Tenggelam setelah salah
                 if (f.y < f.targetY + SINK_DEPTH) {
                     f.y += SINK_SPEED;
                     f.scale = p5.lerp(1, 0, (f.y - f.targetY) / SINK_DEPTH);
                 } else {
                     f.action = "IDLE_SINKED";
-                    // Panggil finishSinkingAndReset setelah tenggelam
                     finishSinkingAndReset();
                 }
                 break;
 
             case "SINK":
-                // Tenggelam karena waktu habis
                 if (f.scale > 0) {
                     f.scale -= SCALE_CHANGE_SPEED;
                     f.y += 3;
@@ -728,7 +771,6 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                 break;
         }
 
-        // Reset to playing state if animation complete
         if (f.action === "IDLE" && gameState.current === "ANIMATING" && padToHide === null) {
             gameState.current = "PLAYING";
         }
@@ -749,18 +791,13 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                 clickedOptionText === currentQuestion.options[currentQuestion.ans];
 
             if (!isCorrect) {
-                // Jawaban Salah
                 frog.current.action = "SINK_AFTER_JUMP";
-                // setFeedback HILANGKAN, hanya suara dan animasi
                 if (wrongSound) wrongSound.play();
-                // Nyawa akan dikurangi di finishSinkingAndReset setelah animasi SINK_AFTER_JUMP selesai
             } else {
-                // Jawaban Benar
                 frog.current.action = "LAND";
                 setFeedback("Benar!");
                 if (correctSound) correctSound.play();
 
-                // Update platform and scroll
                 const clickedPad = currentPads[clickedPadIndex];
                 const scrollDistance = clickedPad.y - currentPlatform.current.y;
                 scrollTargetY.current = yOffset.current - scrollDistance;
@@ -771,7 +808,6 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                     isStart: false,
                 };
 
-                // Update score with time bonus
                 setScore((s) => s + BASE_SCORE + timer * TIME_BONUS_MULTIPLIER);
                 setPadToHide(clickedPadIndex);
 
@@ -786,45 +822,49 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
      * Main draw loop
      */
     const draw = (p5) => {
-        // Update scroll offset
-        yOffset.current = p5.lerp(yOffset.current, scrollTargetY.current, 0.15); 
+        try {
+            // Update scroll offset
+            yOffset.current = p5.lerp(yOffset.current, scrollTargetY.current, 0.15);
 
-        // Draw water background
-        drawWaterBackground(p5);
+            // Draw water background
+            drawWaterBackground(p5);
 
-        // Apply world transform
-        p5.push();
-        p5.translate(0, yOffset.current);
+            // Apply world transform
+            p5.push();
+            p5.translate(0, yOffset.current);
 
-        // Draw water effects
-        drawWaterEffects(p5);
+            // Draw water effects
+            drawWaterEffects(p5);
 
-        // Draw answer pads
-        drawAnswerPads(p5);
+            // Draw answer pads
+            drawAnswerPads(p5);
 
-        // Draw platform (start or last answered question)
-        const platformLabel = currentPlatform.current.isStart
-            ? "Mulai"
-            : `Q${questionIndex}`;
-        const platformFloatY =
-            gameState.current === "PLAYING"
-                ? Math.sin(p5.frameCount * 0.03 + 5) * 5
-                : 0;
-        drawLilyPad(
-            p5,
-            currentPlatform.current.x,
-            currentPlatform.current.y + platformFloatY,
-            PLATFORM_SIZE,
-            platformLabel,
-            -1,
-            1
-        );
+            // Draw platform
+            const platformLabel = currentPlatform.current.isStart
+                ? "Mulai"
+                : `Q${questionIndex}`;
+            const platformFloatY =
+                gameState.current === "PLAYING"
+                    ? Math.sin(p5.frameCount * 0.03 + 5) * 5
+                    : 0;
+            drawLilyPad(
+                p5,
+                currentPlatform.current.x,
+                currentPlatform.current.y + platformFloatY,
+                PLATFORM_SIZE,
+                platformLabel,
+                -1,
+                1
+            );
 
-        // Update and draw frog
-        updateFrog(p5);
-        drawFrog(p5, frog.current.x, frog.current.y, frog.current.scale);
+            // Update and draw frog
+            updateFrog(p5);
+            drawFrog(p5, frog.current.x, frog.current.y, frog.current.scale);
 
-        p5.pop();
+            p5.pop();
+        } catch (error) {
+            console.warn('Error in draw loop:', error);
+        }
     };
 
     /**
@@ -833,7 +873,6 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
     const mousePressed = (p5) => {
         if (gameState.current === "PLAYING") {
             currentPads.forEach((pad, index) => {
-                // Calculate distance relative to the screen (p5.mouseY - yOffset.current)
                 const distance = p5.dist(
                     p5.mouseX,
                     p5.mouseY,
@@ -890,7 +929,7 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                 </div>
             )}
 
-            {/* Game Over / Win Overlay (Gunakan gameStatus sebagai class) */}
+            {/* Game Over / Win Overlay */}
             {gameOver && (
                 <div className={`game-over-overlay ${gameStatus}`}>
                     <div className="game-over-content">
@@ -907,7 +946,7 @@ const FrogQuiz = ({ onBack, questions, currentLevel }) => {
                 </div>
             )}
 
-            {/* Feedback Message (Hanya untuk Benar! dan Waktu Habis!) */}
+            {/* Feedback Message */}
             {feedback && <div className="feedback-text">{feedback}</div>}
 
             {/* P5.js Canvas */}
